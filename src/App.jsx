@@ -6,7 +6,10 @@ import Payment from './components/Payment'
 import Sidebar from './components/Sidebar'
 import HomeDashboard from './components/HomeDashboard'
 import Favorites from './components/Favorites'
+import Contact from './components/Contact'
+import Cart from './components/Cart'
 import SiteFooter from './components/SiteFooter'
+import Profile from './components/Profile'
 
 // Optional: tiny hook to read favorites count from localStorage
 function useFavCount(key = 'fav_books') {
@@ -22,7 +25,6 @@ function useFavCount(key = 'fav_books') {
       }
     }
     read()
-    // Listen for cross-tab changes
     const onStorage = (e) => { if (e.key === key) read() }
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
@@ -35,7 +37,6 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [activePage, setActivePage] = useState('home')
 
-  // Keep Favorites count visible in header
   const favCount = useFavCount()
 
   useEffect(() => {
@@ -48,8 +49,8 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen w-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
+      <div className="min-h-screen w-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="text-xl text-white">Loading...</div>
       </div>
     )
   }
@@ -57,94 +58,63 @@ function App() {
   if (!user) return <Auth />
 
   return (
-    <div className="min-h-screen bg-gray-100 flex overflow-hidden">
+    <div className="min-h-screen w-full bg-[#0a0a0f] flex overflow-hidden">
       {/* Sidebar with page setter */}
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
 
-      <div className="flex-grow ml-20 p-6 overflow-hidden">
+      <div className="flex-grow ml-0 overflow-auto">
         {/* Header */}
-        <header className="bg-white shadow-sm mb-6">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <header className="sticky top-0 z-40 bg-black/40 backdrop-blur-2xl border-b border-white/10 shadow-2xl">
+          <div className="container mx-auto px-6 py-4 flex justify-between items-center">
             <h1
               onClick={() => setActivePage('home')}
-              className="text-3xl font-bold text-gray-800 select-none cursor-pointer"
+              className="text-3xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent select-none cursor-pointer hover:scale-105 transition-transform duration-300"
               title="Go to Home"
             >
-              E - Bookkiee Store
+              E-Bookkiee Store
             </h1>
 
-           
-
-              <span className="text-gray-600 ml-130 select-text">
-                Welcome, {user.email}
+            <div className="flex items-center gap-6">
+              <span className="text-white/80 font-medium hidden md:block">
+                Welcome, <span className="text-purple-300 font-bold">{user.displayName || user.email}</span>
               </span>
               <button
                 onClick={() => signOut(auth)}
-                className="bg-red-500 text-white px-0 py-2 rounded hover:bg-red-600 transition"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               >
                 Logout
               </button>
             </div>
-          
+          </div>
         </header>
 
-        {/* Pages (no react-router needed for this layout) */}
-        {activePage === 'home' && (
-          <HomeDashboard onExploreLibrary={() => setActivePage('library')} />
-        )}
+        {/* Pages */}
+        <div className="relative">
+          {activePage === 'home' && (
+            <HomeDashboard onExploreLibrary={() => setActivePage('library')} />
+          )}
 
-        {activePage === 'library' && (
-          <section>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Your Library</h2>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setActivePage('favorites')}
-                  className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:bg-gray-50"
-                >
-                  View Favorites {favCount > 0}
-                </button>
-              </div>
-            </div>
+          {activePage === 'library' && (
             <Payment user={user} />
-          </section>
-        )}
+          )}
 
-        {activePage === 'favorites' && (
-          <section>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Favorites</h2>
-              <button
-                onClick={() => setActivePage('library')}
-                className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:bg-gray-50"
-              >
-                ← Back to Library
-              </button>
-            </div>
-            {/* Mount the Favorites page directly (remove <Route/> usage) */}
-            <Favorites />
-          </section>
-        )}
-
-        {activePage === 'profile' && (
-          <section>
-            <h2 className="text-2xl font-bold mb-4">Profile</h2>
-            <p>User profile page coming soon.</p>
-          </section>
-        )}
+          {activePage === 'favorites' && (
+            <Favorites onBackToLibrary={() => setActivePage('library')} />
+          )}
 
 
-        {activePage === 'settings' && (
-          <section>
-            <h2 className="text-2xl font-bold mb-4">Settings</h2>
-            <p>Adjust preferences here.</p>
-          </section>
-        )}
+          {activePage === 'contact' && (
+            <Contact />
+          )}
+
+          {activePage === 'profile' && (
+            <Profile />
+          )}
+        </div>
 
         <SiteFooter />
       </div>
     </div>
-    
   )
 }
 
