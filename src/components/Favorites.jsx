@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { auth } from '../firebase'
-import { saveTransaction } from './Cart'
-
 const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000'
 
@@ -690,10 +688,51 @@ export default function Favorites({ onBackToLibrary }) {
                       <div className={`absolute -inset-1 rounded-3xl bg-gradient-to-r ${book.grad} blur-xl opacity-30`} />
                     </div>
                   </article>
+                  
                 )
               })}
             </div>
           )}
+
+            <footer className="relative py-16 px-6 mt-25 -mb-30 border-t border-white/10 bg-black/30 backdrop-blur-xl">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+              <div>
+                <div className="text-2xl font-black mb-4 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
+                  Your Library
+                </div>
+                <p className="text-white/60 text-sm leading-relaxed">
+                  Premium digital ebooks for ambitious creators and coders. Built with passion for readers who lead.
+                </p>
+              </div>
+              
+              <div>
+                <div className="text-sm font-bold text-white/80 mb-4 uppercase tracking-wider">Quick Links</div>
+                <ul className="space-y-2 text-sm text-white/60">
+                  <li><a href="#" className="hover:text-purple-300 transition-colors">About Us</a></li>
+                  <li><a href="#" className="hover:text-purple-300 transition-colors">All Books</a></li>
+                  <li><a href="#" className="hover:text-purple-300 transition-colors">Authors</a></li>
+                  <li><a href="#" className="hover:text-purple-300 transition-colors">Contact</a></li>
+                </ul>
+              </div>
+              
+              <div>
+                <div className="text-sm font-bold text-white/80 mb-4 uppercase tracking-wider">Connect</div>
+                <div className="flex gap-4">
+                  {['Twitter', 'Instagram', 'LinkedIn'].map(social => (
+                    <a key={social} href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/30 transition-all duration-300 flex items-center justify-center text-sm">
+                      {social[0]}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="pt-8 border-t border-white/10 text-center text-white/50 text-sm">
+              © 2025 Your Ebook Library. Built with passion for readers who lead.
+            </div>
+          </div>
+        </footer>
         </section>
 
         {/* SUCCESS MODAL */}
@@ -750,13 +789,17 @@ export default function Favorites({ onBackToLibrary }) {
                 </svg>
               </button>
 
+
               {/* Decorative elements */}
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl" />
-              <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-teal-500/20 rounded-full blur-3xl" />
+              
             </div>
           </div>
+          
         )}
       </div>
+
+      
     </>
+    
   )
 }

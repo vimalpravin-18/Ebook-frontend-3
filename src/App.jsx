@@ -7,8 +7,6 @@ import Sidebar from './components/Sidebar'
 import HomeDashboard from './components/HomeDashboard'
 import Favorites from './components/Favorites'
 import Contact from './components/Contact'
-import Cart from './components/Cart'
-import SiteFooter from './components/SiteFooter'
 import Profile from './components/Profile'
 
 // Optional: tiny hook to read favorites count from localStorage
@@ -71,7 +69,7 @@ function App() {
               className="text-3xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent select-none cursor-pointer hover:scale-105 transition-transform duration-300"
               title="Go to Home"
             >
-              E-Bookkiee Store
+              Book Haven
             </h1>
 
             <div className="flex items-center gap-6">
@@ -112,7 +110,7 @@ function App() {
           )}
         </div>
 
-        <SiteFooter />
+      
       </div>
     </div>
   )

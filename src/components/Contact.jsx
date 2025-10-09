@@ -508,10 +508,10 @@ export default function Contact() {
             {/* Social Icons */}
             <div className="flex flex-wrap items-center justify-center gap-6">
               {[
-                { name: 'Twitter', icon: '🐦', gradient: 'from-blue-400 to-blue-600', link: '#' },
-                { name: 'Instagram', icon: '📸', gradient: 'from-pink-500 to-purple-600', link: '#' },
-                { name: 'LinkedIn', icon: '💼', gradient: 'from-blue-600 to-blue-800', link: '#' },
-                { name: 'YouTube', icon: '📺', gradient: 'from-red-500 to-red-700', link: '#' },
+                { name: 'Twitter', icon: '🐦', gradient: 'from-blue-400 to-blue-600', link: 'https://x.com/VimalPravi51925' },
+                { name: 'Instagram', icon: '📸', gradient: 'from-pink-500 to-purple-600', link: 'https://www.instagram.com/_____op__vimal_____/' },
+                { name: 'LinkedIn', icon: '💼', gradient: 'from-blue-600 to-blue-800', link: 'www.linkedin.com/in/vimal-pravin-v' },
+                { name: 'Github', icon: '📺', gradient: 'from-red-500 to-red-700', link: 'https://github.com/vimalpravin-18' },
                 { name: 'Discord', icon: '💬', gradient: 'from-indigo-500 to-purple-600', link: '#' },
               ].map((social) => (
                 <a
@@ -537,13 +537,46 @@ export default function Contact() {
 
         {/* FOOTER */}
         <footer className="relative py-16 px-6 border-t border-white/10 bg-black/30 backdrop-blur-xl">
-          <div className="mx-auto max-w-7xl text-center">
-            <p className="text-white/50 text-sm">
-              © 2025 NeonStore. We're here to help you succeed.
-            </p>
+          <div className="mx-auto max-w-7xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+              <div>
+                <div className="text-2xl font-black mb-4 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
+                  Your Library
+                </div>
+                <p className="text-white/60 text-sm leading-relaxed">
+                  Premium digital ebooks for ambitious creators and coders. Built with passion for readers who lead.
+                </p>
+              </div>
+              
+              <div>
+                <div className="text-sm font-bold text-white/80 mb-4 uppercase tracking-wider">Quick Links</div>
+                <ul className="space-y-2 text-sm text-white/60">
+                  <li><a href="#" className="hover:text-purple-300 transition-colors">About Us</a></li>
+                  <li><a href="#" className="hover:text-purple-300 transition-colors">All Books</a></li>
+                  <li><a href="#" className="hover:text-purple-300 transition-colors">Authors</a></li>
+                  <li><a href="#" className="hover:text-purple-300 transition-colors">Contact</a></li>
+                </ul>
+              </div>
+              
+              <div>
+                <div className="text-sm font-bold text-white/80 mb-4 uppercase tracking-wider">Connect</div>
+                <div className="flex gap-4">
+                  {['Twitter', 'Instagram', 'LinkedIn'].map(social => (
+                    <a key={social} href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/30 transition-all duration-300 flex items-center justify-center text-sm">
+                      {social[0]}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="pt-8 border-t border-white/10 text-center text-white/50 text-sm">
+              © 2025 Your Ebook Library. Built with passion for readers who lead.
+            </div>
           </div>
         </footer>
       </div>
+
     </>
   )
 }
