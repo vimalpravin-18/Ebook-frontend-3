@@ -179,7 +179,7 @@ function App() {
               className="text-3xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent select-none cursor-pointer hover:scale-105 transition-transform duration-300"
               title="Go to Home"
             >
-              Mind Forge
+              Bookly
             </h1>
 
             <div className="flex items-center gap-6">
@@ -301,7 +301,7 @@ function App() {
             </div>
             
             <div className="pt-8 border-t border-white/10 text-center -ml-50 text-white/50 text-sm">
-              © 2025 Mind Forge. Built with passion for readers who lead.
+              © 2025 Bookly. Built with passion for readers who lead.
             </div>
           </div>
         </footer>

@@ -133,7 +133,7 @@ export default function EdgeHoverSidebar({ activePage, setActivePage }) {
         {/* Footer indicator */}
         <div className="mt-4 flex flex-col items-center gap-2">
           <div className="w-8 h-0.5 rounded-full bg-white/20" />
-          <p className="text-[8px] text-white/40 font-semibold">Mind Forge</p>
+          <p className="text-[8px] text-white/40 font-semibold">Bookly </p>
         </div>
       </aside>
 
