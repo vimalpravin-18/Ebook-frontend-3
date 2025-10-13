@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 
+
 /* ========== ADVANCED ANIMATION HOOKS ========== */
 
 /* Smooth reveal with intersection observer */
-function useReveal(direction = 'up', duration = 900, delay = 0) {
+function useReveal(direction = 'up', duration = 100, delay = 0) {
   const [inView, setInView] = useState(false)
   const ref = useRef(null)
   
@@ -40,7 +41,7 @@ function useReveal(direction = 'up', duration = 900, delay = 0) {
   }
 }
 
-/* Enhanced 3D tilt with light effect */
+/* Enhanced 3D tilt with light effect - 🎯 ENHANCED VERSION */
 function useTilt(maxTilt = 15, glare = true) {
   const ref = useRef(null)
   
@@ -58,18 +59,23 @@ function useTilt(maxTilt = 15, glare = true) {
       const rotateX = (y - 0.5) * -maxTilt * 2
       const rotateY = (x - 0.5) * maxTilt * 2
       
-      el.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`
+      // 🎯 ENHANCED: Changed perspective from 100px to 1000px for deeper 3D effect
+      el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05) translateZ(20px)`
       
       if (glareEl) {
-        glareEl.style.background = `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(255,255,255,0.15), transparent 50%)`
+        glareEl.style.background = `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(255,255,255,0.25), transparent 50%)`
         glareEl.style.opacity = '1'
       }
     }
     
     function onLeave() {
-      el.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
+      // 🎯 ENHANCED: Smooth return to original state
+      el.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1) translateZ(0px)'
       if (glareEl) glareEl.style.opacity = '0'
     }
+    
+    // 🎯 NEW: Add smooth transition
+    el.style.transition = 'transform 0.3s cubic-bezier(0.23, 1, 0.32, 1)'
     
     el.addEventListener('mousemove', onMove)
     el.addEventListener('mouseleave', onLeave)
@@ -147,10 +153,23 @@ function useMagnetic(strength = 0.4) {
   return ref
 }
 
+/* 🎯 NEW: Parallax scroll effect */
+function useParallax(speed = 0.5) {
+  const [offset, setOffset] = useState(0)
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setOffset(window.pageYOffset * speed)
+    }
+    
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [speed])
+  
+  return offset
+}
+
 /* ========== ANIMATED COMPONENTS ========== */
-
-/* Custom Cursor Follower */
-
 
 /* Scroll Progress Indicator */
 function ScrollProgress() {
@@ -306,10 +325,54 @@ export default function HomeDashboard({ onExploreLibrary }) {
   
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   
+  // 🎯 NEW: Parallax offset for background elements
+  const parallaxOffset = useParallax(0.3)
+  
   useEffect(() => {
     const handleMouse = (e) => setMousePos({ x: e.clientX, y: e.clientY })
     window.addEventListener('mousemove', handleMouse)
     return () => window.removeEventListener('mousemove', handleMouse)
+  }, [])
+  
+  // 🎯 NEW: Add floating animation CSS
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.textContent = `
+    @keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 1s ease forwards;
+}
+
+.animate-zoomIn {
+  animation: zoomIn 9s ease forwards;
+};
+      @keyframes float {
+        0%, 100% { transform: translateY(0px) rotateX(0deg); }
+        50% { transform: translateY(-20px) rotateX(2deg); }
+      }
+      
+      @keyframes rotate3d {
+        0% { transform: rotateY(0deg) rotateX(0deg); }
+        100% { transform: rotateY(360deg) rotateX(360deg); }
+      }
+      
+      @keyframes pulse3d {
+  0% { 
+    transform: scale3d(0.8, 0.8, 0.8);
+    opacity: 0;
+  }
+  100% { 
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+    `
+    document.head.appendChild(style)
+    return () => document.head.removeChild(style)
   }, [])
 
   return (
@@ -319,7 +382,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
       
       <main className="min-h-screen w-380 text-white bg-[#0a0a0f] relative overflow-hidden">
         
-        {/* Animated gradient orbs */}
+        {/* Animated gradient orbs - 🎯 ENHANCED with parallax */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           <div 
             className="absolute w-[600px] h-[600px] rounded-full blur-[140px] opacity-30"
@@ -327,6 +390,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
               background: 'radial-gradient(circle, #8b5cf6 0%, transparent 70%)',
               left: `${20 + mousePos.x * 0.02}%`,
               top: `${10 + mousePos.y * 0.02}%`,
+              transform: `translateY(${parallaxOffset * 0.5}px) rotateZ(${parallaxOffset * 0.1}deg)`, // 🎯 NEW
               transition: 'all 0.3s ease-out'
             }}
           />
@@ -336,6 +400,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
               background: 'radial-gradient(circle, #ec4899 0%, transparent 70%)',
               right: `${15 + mousePos.x * 0.015}%`,
               bottom: `${20 + mousePos.y * 0.015}%`,
+              transform: `translateY(${parallaxOffset * 0.3}px) rotateZ(${-parallaxOffset * 0.08}deg)`, // 🎯 NEW
               transition: 'all 0.3s ease-out'
             }}
           />
@@ -345,19 +410,24 @@ export default function HomeDashboard({ onExploreLibrary }) {
               background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)',
               left: `${50 + mousePos.x * 0.01}%`,
               top: `${50 + mousePos.y * 0.01}%`,
+              transform: `translateY(${parallaxOffset * 0.4}px) scale(${1 + parallaxOffset * 0.0001})`, // 🎯 NEW
               transition: 'all 0.3s ease-out'
             }}
           />
         </div>
 
-        {/* HERO SECTION */}
+        {/* HERO SECTION - 🎯 ENHANCED with floating animation */}
         <section className="relative min-h-screen w-385 flex items-center justify-center overflow-hidden">
           <FloatingParticles />
           
           {/* Background gradient overlay */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_#0a0a0f_100%)]" />
           
-          <div {...hero} className="relative z-10 px-6 max-w-7xl text-center">
+          <div 
+            {...hero} 
+            className="relative z-10 px-6 max-w-7xl text-center"
+            style={{ animation: 'pulse3d 2s ease-out ' }} // 🎯 NEW
+          >
             {/* Floating badge */}
             <div className="inline-flex items-center gap-3 px-6 py-3 mb-8 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl group hover:bg-white/10 transition-all duration-900">
               <span className="relative flex h-3 w-3">
@@ -381,7 +451,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
             
             {/* Subtitle */}
             <p className="mt-8 text-xl md:text-2xl font-light text-white/70 max-w-3xl mx-auto leading-relaxed">
-              Curated ebooks on discipline, focus, and execution—
+              Curated ebooks on discipline, focus, and execution
               <br className="hidden md:block" />
               <span className="text-purple-300">crafted for ambitious creators and coders.</span>
             </p>
@@ -418,15 +488,34 @@ export default function HomeDashboard({ onExploreLibrary }) {
               </a>
             </div>
             
-            {/* Stats row */}
+            {/* Stats row - 🎯 ENHANCED with 3D rotation on hover */}
             <div {...stats} className="mt-24 grid grid-cols-3 gap-8 max-w-3xl mx-auto">
               {[
                 { label: 'Books', value: 10, suffix: '+' },
                 { label: 'Readers', value: 20, suffix: '+' },
                 { label: 'Rating', value: 3.2, suffix: '/5' },
               ].map((stat) => (
-                <div key={stat.label} className="text-center group cursor-default">
-                  <div className="text-4xl md:text-5xl font-black bg-gradient-to-br from-white to-purple-300 bg-clip-text text-transparent transition-transform group-hover:scale-110 duration-300">
+                <div 
+                  key={stat.label} 
+                  
+                  className="text-center group cursor-default"
+                  style={{ perspective: '1000px', transformStyle: 'preserve-3d' }} // 🎯 NEW
+                >
+                  
+                  <div 
+                    className="text-4xl md:text-5xl font-black bg-gradient-to-br from-white to-purple-300 bg-clip-text text-transparent transition-transform group-hover:scale-110 duration-300"
+                    style={{
+                      transform: 'rotateY(0deg)',
+                      transition: 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
+                      transformStyle: 'preserve-3d'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'rotateY(0deg) scale(1)' // 🎯 NEW: 3D spin
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'rotateY(0deg) scale(1)'
+                    }}
+                  >
                     <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                   </div>
                   <div className="mt-2 text-sm text-white/60 uppercase tracking-wider">{stat.label}</div>
@@ -434,28 +523,19 @@ export default function HomeDashboard({ onExploreLibrary }) {
               ))}
             </div>
           </div>
-          
-          {/* Scroll indicator */}
-          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-white/50 animate-bounce">
-            <span className="text-xs uppercase tracking-widest">Scroll</span>
-            <svg className="w-6 h-10" fill="none" stroke="currentColor" strokeWidth={2}>
-              <rect x="1" y="1" width="22" height="36" rx="11" />
-              <circle cx="12" cy="10" r="3" fill="currentColor" className="animate-pulse" />
-            </svg>
-          </div>
         </section>
 
-        {/* ABOUT SECTION */}
+        {/* ABOUT SECTION - 🎯 ENHANCED with 3D perspective wrapper */}
         <section id="about" className="relative py-32 px-6">
           <div className="mx-auto max-w-7xl">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               
-              {/* Image side */}
-              <div {...aboutImg} className="relative">
+              {/* Image side - 🎯 ENHANCED with perspective container */}
+              <div {...aboutImg} className="relative" style={{ perspective: '1500px' }}> {/* 🎯 NEW */}
                 <div
                   ref={tiltAbout}
                   className="group relative h-[600px] rounded-3xl overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.5)] transition-all duration-700 border border-white/10"
-                  style={{ transformStyle: 'preserve-3d' }}
+                  style={{ transformStyle: 'preserve-3d', transform: 'rotateY(0deg)' }} // 🎯 NEW
                 >
                   <div className="absolute inset-0 bg-cover bg-center transform scale-105 group-hover:scale-110 transition-transform duration-700" 
                        style={{ backgroundImage: "url('/covers/designed-to-read.png')" }} />
@@ -504,7 +584,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
                 </h2>
                 
                 <p className="text-white/70 text-xl leading-relaxed mb-10">
-                  Every title distills signal from noise—tactics, mental models, and systems that turn <span className="text-purple-300 font-semibold">intent into habit</span> and output.
+                  Every title distills signal from noise tactics, mental models, and systems that turn <span className="text-purple-300 font-semibold">intent into habit</span> and output.
                 </p>
                 
                 {/* Feature list */}
@@ -538,7 +618,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
           </div>
         </section>
 
-        {/* CATEGORIES SECTION */}
+        {/* CATEGORIES SECTION - 🎯 ENHANCED with advanced 3D card effects */}
         <section className="relative py-32 px-6">
           <div className="mx-auto max-w-7xl">
             
@@ -563,28 +643,35 @@ export default function HomeDashboard({ onExploreLibrary }) {
                   title: 'Focus & Flow', 
                   desc: 'Systems to protect attention and do deep work.', 
                   color: 'from-blue-600/90 to-cyan-600/90',
-                  books: 18
                 },
                 { 
                   img: '/covers/exp-2.png', 
                   title: 'Discipline', 
                   desc: 'Habit loops, friction design, and consistency.', 
                   color: 'from-purple-600/90 to-pink-600/90',
-                  books: 24
                 },
                 { 
                   img: '/covers/exp-3.png', 
                   title: 'Entrepreneurship', 
                   desc: 'Leverage, offers, and compounding skills.', 
                   color: 'from-orange-600/90 to-red-600/90',
-                  books: 16
                 },
               ].map((card, idx) => (
                 <div key={card.title} className="category-card opacity-0 translate-y-8">
                   <div
                     ref={tiltCards[idx]}
                     className="group relative h-[480px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 border border-white/10 cursor-pointer"
-                    style={{ transformStyle: 'preserve-3d' }}
+                    style={{ 
+                      transformStyle: 'preserve-3d',
+                      perspective: '1200px', // 🎯 NEW
+                      transition: 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'rotateY(5deg) rotateX(5deg) translateZ(30px)' // 🎯 NEW
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'rotateY(0deg) rotateX(0deg) translateZ(0px)'
+                    }}
                   >
                     {/* Image */}
                     <img
@@ -595,7 +682,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
                     />
                     
                     {/* Gradient overlay */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-70 group-hover:opacity-85 transition-opacity duration-500`} />
+                    <div className={`absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-900 opacity-50 group-hover:opacity-0 transition-opacity duration-500`} />
                     
                     {/* Glare effect */}
                     <div className="glare-effect absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none" />
@@ -604,9 +691,6 @@ export default function HomeDashboard({ onExploreLibrary }) {
                     <div className="absolute inset-0 p-8 flex flex-col justify-between">
                       {/* Top badge */}
                       <div className="flex items-center justify-between">
-                        <span className="px-4 py-2 rounded-full bg-black/40 backdrop-blur-xl border border-white/20 text-sm font-semibold">
-                          {card.books} Books
-                        </span>
                         <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-500">
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -618,13 +702,6 @@ export default function HomeDashboard({ onExploreLibrary }) {
                       <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                         <h4 className="text-4xl font-black mb-3 text-white">{card.title}</h4>
                         <p className="text-white/90 text-base leading-relaxed mb-6">{card.desc}</p>
-                        
-                        <button className="px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/30 text-sm font-semibold transition-all duration-300 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 inline-flex items-center gap-2">
-                          Explore
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                          </svg>
-                        </button>
                       </div>
                     </div>
                     
@@ -639,7 +716,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
           </div>
         </section>
 
-        {/* LATEST RELEASES */}
+        {/* LATEST RELEASES - 🎯 ENHANCED with flip-on-hover */}
         <section {...releases} className="relative py-32 px-6">
           <div className="mx-auto max-w-7xl">
             
@@ -665,7 +742,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
                 desc: 'Build systems that remove willpower from the loop. Learn the frameworks that turn fleeting motivation into lasting habits.',
                 author: 'Vimal Pravin',
                 pages: 240,
-                rating: 4.9,
+                
                 badge: 'Bestseller',
                 badgeColor: 'from-purple-600 to-pink-600'
               },
@@ -676,7 +753,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
                 desc: 'A playbook for protecting your attention and achieving flow state. Reclaim your mind from the chaos of modern life.',
                 author: 'Vimal Pravin',
                 pages: 220,
-                rating: 4.8,
+                
                 badge: 'New Release',
                 badgeColor: 'from-blue-600 to-cyan-600'
               },
@@ -687,19 +764,40 @@ export default function HomeDashboard({ onExploreLibrary }) {
                 desc: 'Time tactics that translate to output and clarity. Make every moment count with proven systems for productivity.',
                 author: 'Vimal Pravin',
                 pages: 200,
-                rating: 4.7,
+                
                 badge: 'Top Rated',
                 badgeColor: 'from-orange-600 to-red-600'
               }
             ].map((book, i) => (
               <div key={book.title} className={`grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32 last:mb-0 ${i % 2 ? 'lg:grid-flow-dense' : ''}`}>
                 
-                {/* Image side */}
+                {/* Image side - 🎯 ENHANCED with advanced mouse tracking */}
                 <div className={`relative ${i % 2 ? 'lg:col-start-2' : ''}`}>
                   <div
                     ref={tiltReleases[i]}
                     className="group relative rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 border border-white/10"
-                    style={{ transformStyle: 'preserve-3d' }}
+                    style={{ 
+                      transformStyle: 'preserve-3d',
+                      perspective: '1500px', // 🎯 NEW
+                      transform: 'rotateY(0deg)',
+                      transition: 'transform 0.8s cubic-bezier(0.23, 1, 0.32, 1)'
+                    }}
+                    onMouseMove={(e) => { // 🎯 NEW: Advanced mouse tracking
+                      const rect = e.currentTarget.getBoundingClientRect()
+                      const x = (e.clientX - rect.left) / rect.width - 0.5
+                      const y = (e.clientY - rect.top) / rect.height - 0.5
+                      
+                      e.currentTarget.style.transform = `
+                        perspective(1500px)
+                        rotateY(${x * 15}deg) 
+                        rotateX(${-y * 15}deg)
+                        scale3d(1.02, 1.02, 1.02)
+                        translateZ(20px)
+                      `
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'rotateY(0deg) rotateX(0deg) scale3d(1, 1, 1) translateZ(0px)'
+                    }}
                   >
                     <img
                       src={book.img}
@@ -728,8 +826,6 @@ export default function HomeDashboard({ onExploreLibrary }) {
                           </svg>
                           {book.rating}
                         </span>
-                        <span>•</span>
-                        <span>{book.pages} pages</span>
                       </div>
                     </div>
                   </div>
@@ -755,23 +851,6 @@ export default function HomeDashboard({ onExploreLibrary }) {
                   <p className="text-white/70 text-lg leading-relaxed mb-8">
                     {book.desc}
                   </p>
-                  
-                  <div className="flex flex-wrap gap-4">
-                    <button
-                      ref={magneticBtns[2]}
-                      onClick={onExploreLibrary}
-                      className="group px-8 py-4 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 font-bold shadow-[0_0_30px_rgba(168,85,247,0.4)] hover:shadow-[0_0_50px_rgba(168,85,247,0.6)] transition-all duration-300 inline-flex items-center gap-2"
-                    >
-                      Read Sample
-                      <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
-                    </button>
-                    
-                    <button className="px-8 py-4 rounded-full border-2 border-white/20 backdrop-blur-xl hover:bg-white/5 hover:border-white/40 font-semibold transition-all duration-300">
-                      Preview
-                    </button>
-                  </div>
                 </div>
               </div>
             ))}
@@ -832,7 +911,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
                   </h3>
                   
                   <p className="text-white/75 text-xl leading-relaxed mb-8">
-                    A creator who weaves code, craft, and creativity into readable playbooks for makers. Believer in <span className="text-purple-300 font-semibold">small steps daily, compounding forever</span>.
+                    Crafting eBooks that spark thought and inspire change. Always learning, always creating.  <span className="text-purple-300 font-semibold">one idea, one story, one project at a time.</span>.
                   </p>
                   
                   {/* Tags */}
@@ -847,9 +926,9 @@ export default function HomeDashboard({ onExploreLibrary }) {
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-6 mb-10">
                     {[
-                      { label: 'Books', value: 12 },
-                      { label: 'Readers', value: 10, suffix: 'K+' },
-                      { label: 'Reviews', value: 500, suffix: '+' },
+                      { label: 'Books', value: 10, suffix: '+' },
+                      { label: 'Readers', value: 50, suffix: '+' },
+                      { label: 'Reviews', value: 40, suffix: '+' },
                     ].map(stat => (
                       <div key={stat.label} className="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
                         <div className="text-3xl font-black text-purple-300">
@@ -888,7 +967,7 @@ export default function HomeDashboard({ onExploreLibrary }) {
             </div>
             
             <blockquote className="text-4xl md:text-5xl font-bold leading-tight text-white/95 mb-8">
-              Knowledge compounds. Choose pages that bend the arc of your life toward mastery.
+              Every word you read reshapes your mind. Every idea you act on rewrites your future.
             </blockquote>
             
             <div className="text-purple-300 font-semibold text-xl">— Vimal Pravin</div>
@@ -932,47 +1011,6 @@ export default function HomeDashboard({ onExploreLibrary }) {
             </div>
           </div>
         </section>
-
-        {/* FOOTER */}
-        <footer className="relative py-16 px-6 border-t border-white/10 bg-black/30 backdrop-blur-xl">
-          <div className="mx-auto max-w-7xl">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-              <div>
-                <div className="text-2xl font-black mb-4 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
-                  Your Library
-                </div>
-                <p className="text-white/60 text-sm leading-relaxed">
-                  Premium digital ebooks for ambitious creators and coders. Built with passion for readers who lead.
-                </p>
-              </div>
-              
-              <div>
-                <div className="text-sm font-bold text-white/80 mb-4 uppercase tracking-wider">Quick Links</div>
-                <ul className="space-y-2 text-sm text-white/60">
-                  <li><a href="#" className="hover:text-purple-300 transition-colors">About Us</a></li>
-                  <li><a href="#" className="hover:text-purple-300 transition-colors">All Books</a></li>
-                  <li><a href="#" className="hover:text-purple-300 transition-colors">Authors</a></li>
-                  <li><a href="#" className="hover:text-purple-300 transition-colors">Contact</a></li>
-                </ul>
-              </div>
-              
-              <div>
-                <div className="text-sm font-bold text-white/80 mb-4 uppercase tracking-wider">Connect</div>
-                <div className="flex gap-4">
-                  {['Twitter', 'Instagram', 'LinkedIn'].map(social => (
-                    <a key={social} href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/30 transition-all duration-300 flex items-center justify-center text-sm">
-                      {social[0]}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </div>
-            
-            <div className="pt-8 border-t border-white/10 text-center text-white/50 text-sm">
-              © 2025 Your Ebook Library. Built with passion for readers who lead.
-            </div>
-          </div>
-        </footer>
       </main>
     </>
   )

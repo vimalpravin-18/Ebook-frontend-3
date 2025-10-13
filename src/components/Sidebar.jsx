@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 
 const navItems = [
   { label: 'Home', icon: '🏠', gradient: 'from-blue-500 to-cyan-500', shadow: 'shadow-blue-500/50' },
@@ -8,323 +8,142 @@ const navItems = [
   { label: 'Profile', icon: '👤', gradient: 'from-violet-500 to-purple-500', shadow: 'shadow-violet-500/50' }
 ]
 
-export default function CircularSidebar({ activePage, setActivePage }) {
-  // Drag state
-  const [position, setPosition] = useState({ x: 80, y: 80 }) // starting position
-  const [dragging, setDragging] = useState(false)
-  const dragOffset = useRef({ x: 0, y: 0 })
-  const sidebarRef = useRef(null)
-
-  // Button/Sidebar state
-  const [hovering, setHovering] = useState(false)
-  const [clickedIndex, setClickedIndex] = useState(null)
-  const [hoveredIndex, setHoveredIndex] = useState(null)
-  const radius = 107
-
-  useEffect(() => {
-    if (dragging) {
-      const handleMouse = (e) => {
-        const x = e.clientX - dragOffset.current.x
-        const y = e.clientY - dragOffset.current.y
-        setPosition({ x, y })
-      }
-      const handleUp = () => setDragging(false)
-      window.addEventListener('mousemove', handleMouse)
-      window.addEventListener('mouseup', handleUp)
-      return () => {
-        window.removeEventListener('mousemove', handleMouse)
-        window.removeEventListener('mouseup', handleUp)
-      }
-    }
-  }, [dragging])
-
-  useEffect(() => {
-    if (clickedIndex !== null) {
-      const timer = setTimeout(() => setClickedIndex(null), 600)
-      return () => clearTimeout(timer)
-    }
-  }, [clickedIndex])
-
-  const onMainDown = (e) => {
-    setDragging(true)
-    // Support both mouse and touch
-    if (e.type === 'touchstart') {
-      const touch = e.touches[0]
-      dragOffset.current.x = touch.clientX - position.x
-      dragOffset.current.y = touch.clientY - position.y
-    } else {
-      dragOffset.current.x = e.clientX - position.x
-      dragOffset.current.y = e.clientY - position.y
-    }
-  }
-
-  // Touch drag support
-  useEffect(() => {
-    if (dragging) {
-      const handleTouchMove = (e) => {
-        const touch = e.touches[0]
-        const x = touch.clientX - dragOffset.current.x
-        const y = touch.clientY - dragOffset.current.y
-        setPosition({ x, y })
-      }
-      const handleTouchEnd = () => setDragging(false)
-      window.addEventListener('touchmove', handleTouchMove)
-      window.addEventListener('touchend', handleTouchEnd)
-      return () => {
-        window.removeEventListener('touchmove', handleTouchMove)
-        window.removeEventListener('touchend', handleTouchEnd)
-      }
-    }
-  }, [dragging])
-
-  const handleClick = (item, index) => {
-    setClickedIndex(index)
-    setActivePage(item.label.toLowerCase())
-    if (navigator.vibrate) {
-      navigator.vibrate(60)
-    }
-  }
-
-  // Prevent unwanted selection on drag
-  useEffect(() => {
-    if (dragging) {
-      document.body.style.userSelect = "none"
-    } else {
-      document.body.style.userSelect = ""
-    }
-    return () => { document.body.style.userSelect = "" }
-  }, [dragging])
+export default function EdgeHoverSidebar({ activePage, setActivePage }) {
+  const [open, setOpen] = useState(false)
+  const [hoveredItem, setHoveredItem] = useState(null)
 
   return (
-    <div
-      ref={sidebarRef}
-      style={{
-        position: 'fixed',
-        left: position.x,
-        top: position.y,
-        zIndex: 99999,
-        touchAction: 'none'
-      }}
-    >
-      {/* Main Button - draggable */}
+    <div style={{ zIndex: 200 }}>
+
+      {/* Minimal hover trigger strip */}
       <div
-        className="relative flex items-center justify-center"
-        style={{ width: 120, height: 120 }}
-        onMouseEnter={() => setHovering(true)}
-        onMouseLeave={() => setHovering(false)}
-        onTouchStart={() => setHovering(true)}
-        onTouchEnd={() => setHovering(false)}
+        className={`
+          fixed top-0 left-0 w-2 h-full z-50
+          transition-all duration-300
+          ${open ? 'opacity-0 pointer-events-none' : 'opacity-100'}
+        `}
+        onMouseEnter={() => setOpen(true)}
+        tabIndex={0}
       >
-        <div
-          className="absolute z-40"
-          style={{
-            width: 120,
-            height: 120,
-            cursor: dragging ? 'grabbing' : 'grab',
-            userSelect: 'none'
-          }}
-          onMouseDown={onMainDown}
-          onTouchStart={onMainDown}
-        >
-          {/* Spinning Ring */}
-          {hovering &&
-            <div className="absolute inset-0 -m-10 rounded-full border-2 border-dashed border-1px animate-spin"
-              style={{ animationDuration: '10s' }} />}
-          {/* Main pulse background */}
-          <div className={`absolute inset-0 rounded-full bg-gradient-to-br from-purple-500 to-pink-5100 transition-all duration-300 ${
-            hovering ? 'scale-150 opacity-0 blur-2xl' : 'scale-110 opacity-0 blur-xl'
-          }`} />
-
-          {/* Main button circle */}
-          <button
-            tabIndex={-1}
-            className={`relative w-10 h-10 ml-10 mt-10 rounded-full flex items-center justify-center cursor-pointer transition-all duration-900 overflow-hidden select-none ${
-              dragging ? 'opacity-60' :
-              hovering 
-                ? 'bg-gradient-to-br from-purple-600 to-pink-600 shadow-[0_0_60px_rgba(168,85,247,1)] scale-110 rotate-180'
-                : 'bg-gradient-to-br from-purple-500 to-pink-500 shadow-[0_0_30px_rgba(168,85,247,0.6)] hover:scale-105'
-            }`}
-          >
-            {/* Animated gradient overlay */}
-            <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-9000 ${
-              hovering ? 'translate-x-full' : '-translate-x-full'
-            }`} />
-            {/* Icon */}
-            <span className={`relative z-10 text-xl font-bold transition-all duration-500 ${
-              dragging ? 'opacity-60' :
-              hovering ? 'rotate-180 scale-125' : 'rotate-0'
-            }`}>
-              {hovering ? '✕' : '☰'}
-            </span>
-            {/* Ping effect when not hovering */}
-            {!hovering && (
-              <>
-                <span className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 animate-ping opacity-30" />
-                <span className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 animate-pulse opacity-40" />
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* Radial Menu Items */}
-        {navItems.map((item, i) => {
-          const angle = (i / navItems.length) * Math.PI * 2 - Math.PI / 2
-          const x = Math.cos(angle) * radius
-          const y = Math.sin(angle) * radius
-          const isActive = activePage === item.label.toLowerCase()
-          const isHovered = hoveredIndex === i
-          const isClicked = clickedIndex === i
-
-          return (
-            <div
-              key={item.label}
-              className="absolute"
-              style={{
-                transform: hovering 
-                  ? `translate(-50%, -50%) translateX(${x}px) translateY(${y}px)` 
-                  : `translate(-50%, -50%) translateX(0px) translateY(0px)`,
-                opacity: hovering ? 1 : 0,
-                left: '50%',
-                top: '50%',
-                transition: `all ${0.6 + i * 0.1}s cubic-bezier(0.34, 1.56, 0.64, 1)`,
-                zIndex: hovering ? 10 : -1,
-                pointerEvents: hovering ? 'auto' : 'none'
-              }}
-            >
-              {/* Connection line */}
-              {hovering && isHovered && (
-                <div 
-                  className="absolute top-1/2 left-1/2 w-px bg-gradient-to-t from-white/50 to-transparent animate-pulse"
-                  style={{
-                    height: `${radius}px`,
-                    transform: `rotate(${angle + Math.PI / 2}rad) translateX(-50%)`,
-                    transformOrigin: 'top',
-                  }}
-                />
-              )}
-              {/* Glow ring */}
-              {(isActive || isHovered) && (
-                <div className={`absolute inset-0 -m-2 rounded-full bg-gradient-to-br ${item.gradient} opacity-40 blur-xl animate-pulse`} />
-              )}
-              {/* Button */}
-              <button
-                onClick={() => handleClick(item, i)}
-                onMouseEnter={() => setHoveredIndex(i)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                title={item.label}
-                tabIndex={-1}
-                className={`relative w-16 h-16 rounded-full border-2 flex items-center justify-center transition-all duration-900 overflow-hidden ${
-                  isActive 
-                    ? `bg-gradient-to-br ${item.gradient} border-white ${item.shadow} shadow-2xl scale-110` 
-                    : isHovered
-                    ? `bg-gradient-to-br ${item.gradient} border-white/80 ${item.shadow} shadow-xl scale-125`
-                    : 'bg-black/70 backdrop-blur-xl border-white/30 shadow-lg'
-                } ${
-                  isClicked ? 'scale-90' : ''
-                }`}
-              >
-                {/* Ripple click effect */}
-                {isClicked && (
-                  <>
-                    <span className={`absolute inset-0 rounded-full bg-white animate-ping opacity-75`} />
-                    <span className={`absolute inset-0 rounded-full bg-gradient-to-br ${item.gradient} animate-pulse`} />
-                  </>
-                )}
-                {/* Rotating border on hover */}
-                {isHovered && (
-                  <span 
-                    className={`absolute inset-0 rounded-full bg-gradient-to-r ${item.gradient} opacity-50 blur-sm animate-spin`}
-                    style={{ animationDuration: '2s' }}
-                  />
-                )}
-                {/* Icon */}
-                <span className={`relative z-10 text-3xl transition-all duration-300 ${
-                  isActive || isHovered ? 'scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : ''
-                } ${
-                  isClicked ? 'scale-150 rotate-12' : ''
-                }`}>
-                  {item.icon}
-                </span>
-                {/* Active indicator dot */}
-                {isActive && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white shadow-lg" />
-                  </span>
-                )}
-                {/* Hover shine effect */}
-                {isHovered && (
-                  <div className="absolute inset-0 rounded-full">
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer" 
-                      style={{
-                        animation: 'shimmer 1.5s infinite',
-                        backgroundSize: '200% 100%'
-                      }}
-                    />
-                  </div>
-                )}
-                {/* Inner glow */}
-                {(isActive || isHovered) && (
-                  <div className={`absolute inset-2 rounded-full bg-gradient-to-br ${item.gradient} opacity-20 blur-md`} />
-                )}
-              </button>
-              {/* Label on hover */}
-              {isHovered && (
-                <div 
-                  className="absolute top-1/2 -translate-y-1/2 whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-300"
-                  style={{
-                    left: x > 0 ? 'calc(100% + 16px)' : 'auto',
-                    right: x < 0 ? 'calc(100% + 16px)' : 'auto',
-                  }}
-                >
-                  <div className={`px-4 py-2 rounded-xl bg-gradient-to-br ${item.gradient} backdrop-blur-xl border border-white/20 shadow-2xl`}>
-                    <span className="text-sm font-bold text-white drop-shadow-lg">
-                      {item.label}
-                    </span>
-                  </div>
-                </div>
-              )}
-              {/* Orbital particles */}
-              {isHovered && (
-                <>
-                  <span 
-                    className="absolute w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-orbit"
-                    style={{ animationDuration: '3.5s', animationDelay: '0s' }}
-                  />
-                  <span 
-                    className="absolute w-1 h-1 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.8)] animate-orbit"
-                    style={{ animationDuration: '2s', animationDelay: '0.5s' }}
-                  />
-                </>
-              )}
-            </div>
-          )
-        })}
+        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-1 h-20 bg-gradient-to-b from-purple-500/50 via-pink-500/50 to-orange-500/50 rounded-r-full animate-pulse" />
       </div>
 
-      {/* CSS for animation */}
-      <style jsx>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        @keyframes orbit {
-          0% { 
-            transform: rotate(0deg) translateX(32px) rotate(0deg);
-            opacity: 0;
-          }
-          50% { 
-            opacity: 1;
-          }
-          100% { 
-            transform: rotate(360deg) translateX(32px) rotate(-360deg);
-            opacity: 0;
-          }
-        }
-        .animate-orbit {
-          animation: orbit 2s infinite;
-        }
-      `}</style>
+      {/* Sidebar: slides in from left with labels */}
+      <aside
+        className={`
+          fixed top-0 left-0 h-screen w-24
+          flex flex-col py-6 items-center
+          bg-gradient-to-b from-black/70 via-black/60 to-black/70 backdrop-blur-2xl 
+          border-r border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)]
+          z-50
+          transition-all duration-400 ease-out
+          ${open ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}
+        `}
+        onMouseLeave={() => {
+          setOpen(false)
+          setHoveredItem(null)
+        }}
+        tabIndex={0}
+      >
+        {/* Animated glow bar */}
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500/60 via-purple-500/60 via-pink-500/60 to-orange-500/60 animate-pulse" />
+
+        {/* Logo/Brand */}
+        <div className="mb-8 mt-2">
+          <div className="w-18 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform duration-300">
+            <span className="text-2xl">📖</span>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 flex flex-col justify-center gap-8 w-full px-3">
+          {navItems.map((item) => {
+            const isActive = activePage === item.label.toLowerCase()
+            const isHovered = hoveredItem === item.label
+
+            return (
+              <button
+                key={item.label}
+                onClick={() => {
+                  setActivePage(item.label.toLowerCase())
+                  setOpen(false)
+                }}
+                onMouseEnter={() => setHoveredItem(item.label)}
+                onMouseLeave={() => setHoveredItem(null)}
+                className={`
+                  relative flex flex-col items-center justify-center
+                  w-full py-3 px-2 rounded-xl
+                  transition-all duration-300
+                  group
+                  ${isActive
+                    ? `bg-gradient-to-br ${item.gradient} shadow-lg scale-105`
+                    : 'bg-white/5 hover:bg-white/10 hover:scale-105'
+                  }
+                `}
+              >
+                {/* Active indicator line */}
+                {isActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full bg-white animate-pulse" />
+                )}
+
+                {/* Icon */}
+                <div className={`
+                  text-2xl mb-1
+                  transition-all duration-300
+                  ${isActive || isHovered ? 'scale-110 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : 'scale-100'}
+                `}>
+                  {item.icon}
+                </div>
+
+                {/* Label */}
+                <span className={`
+                  text-[10px] font-bold uppercase tracking-wider
+                  transition-all duration-300
+                  ${isActive 
+                    ? 'text-white drop-shadow-lg' 
+                    : 'text-white/70 group-hover:text-white'
+                  }
+                  ${isActive || isHovered ? 'scale-105' : 'scale-100'}
+                `}>
+                  {item.label}
+                </span>
+
+                {/* Hover glow effect */}
+                <div className={`
+                  absolute inset-0 rounded-xl
+                  bg-gradient-to-r ${item.gradient}
+                  opacity-0 group-hover:opacity-20 blur-md
+                  transition-opacity duration-300
+                  pointer-events-none
+                `} />
+
+                {/* Shine animation on hover */}
+                <div className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
+                  <div className={`
+                    absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent
+                    -translate-x-full group-hover:translate-x-full
+                    transition-transform duration-700
+                  `} />
+                </div>
+              </button>
+            )
+          })}
+        </nav>
+
+        {/* Footer indicator */}
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <div className="w-8 h-0.5 rounded-full bg-white/20" />
+          <p className="text-[8px] text-white/40 font-semibold">Mind Forge</p>
+        </div>
+      </aside>
+
+      {/* Backdrop overlay when sidebar is open */}
+      {open && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-40 transition-opacity duration-300"
+          onClick={() => setOpen(false)}
+        />
+      )}
     </div>
   )
 }

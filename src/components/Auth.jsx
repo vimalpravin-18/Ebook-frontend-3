@@ -1,59 +1,78 @@
 import { useState, useEffect, useRef } from 'react'
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 import { auth } from '../firebase'
 
-/* ========== ANIMATED COMPONENTS ========== */
+/* ========== ANIMATED BACKGROUND WITH FLYING BOOKS ========== */
 
-function FloatingParticles() {
-  const canvasRef = useRef(null)
-  
+function FlyingBooks() {
+  const containerRef = useRef(null)
+  const [books, setBooks] = useState([])
+
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    const bookSymbols = ['📚', '📖', '📕', '📗', '📘', '📙', '📔', '📓', '📒', '✨', '⭐', '💫', '🌟', '🎯', '🚀', '💡', '🔥', '✏️', '📝', '🎨']
     
-    const particles = Array.from({ length: 40 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      radius: Math.random() * 1.5 + 0.5,
-      opacity: Math.random() * 0.3 + 0.1,
-    }))
-    
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      
-      particles.forEach(p => {
-        p.x += p.vx
-        p.y += p.vy
-        
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1
-        
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`
-        ctx.fill()
-      })
-      
-      requestAnimationFrame(animate)
+    const generateBooks = () => {
+      return Array.from({ length: 25 }, (_, i) => ({
+        id: i,
+        symbol: bookSymbols[Math.floor(Math.random() * bookSymbols.length)],
+        size: Math.random() * 30 + 20,
+        left: Math.random() * 100,
+        animationDuration: Math.random() * 20 + 15,
+        delay: Math.random() * -20,
+        opacity: Math.random() * 0.4 + 0.1,
+        rotation: Math.random() * 360
+      }))
     }
-    
-    animate()
-    
-    const handleResize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-    }
-    
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+
+    setBooks(generateBooks())
   }, [])
-  
-  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none opacity-30" />
+
+  return (
+    <div ref={containerRef} className="fixed inset-0 overflow-hidden pointer-events-none">
+      {books.map((book) => (
+        <div
+          key={book.id}
+          className="absolute animate-float-up"
+          style={{
+            left: `${book.left}%`,
+            fontSize: `${book.size}px`,
+            animationDuration: `${book.animationDuration}s`,
+            animationDelay: `${book.delay}s`,
+            opacity: book.opacity,
+            bottom: '-100px',
+            transform: `rotate(${book.rotation}deg)`
+          }}
+        >
+          {book.symbol}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function AnimatedBackground({ isLogin }) {
+  return (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      {[...Array(4)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full blur-[120px] animate-blob"
+          style={{
+            width: `${350 + i * 60}px`,
+            height: `${350 + i * 60}px`,
+            background: isLogin
+              ? `radial-gradient(circle, hsl(${220 + i * 20}, 85%, 65%) 0%, transparent 70%)`
+              : `radial-gradient(circle, hsl(${140 + i * 20}, 75%, 55%) 0%, transparent 70%)`,
+            left: `${15 + i * 20}%`,
+            top: `${10 + i * 25}%`,
+            opacity: 0.12,
+            animationDelay: `${i * 0.7}s`,
+            animationDuration: `${12 + i * 3}s`
+          }}
+        />
+      ))}
+    </div>
+  )
 }
 
 export default function Auth() {
@@ -61,21 +80,26 @@ export default function Auth() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [isLogin, setIsLogin] = useState(true)
+  const [isLogin, setIsLogin] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-
-  useEffect(() => {
-    const handleMouse = (e) => setMousePos({ x: e.clientX, y: e.clientY })
-    window.addEventListener('mousemove', handleMouse)
-    return () => window.removeEventListener('mousemove', handleMouse)
-  }, [])
+  const [successMessage, setSuccessMessage] = useState('')
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  
+  // Focus states for floating labels
+  const [nameFocused, setNameFocused] = useState(false)
+  const [emailFocused, setEmailFocused] = useState(false)
+  const [passwordFocused, setPasswordFocused] = useState(false)
+  const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false)
 
   const handleAuth = async (e) => {
     e.preventDefault()
     setLoading(true)
     setErrorMessage('')
+    setSuccessMessage('')
 
     try {
       if (!isLogin && password !== confirmPassword) {
@@ -86,306 +110,616 @@ export default function Auth() {
 
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password)
+        setSuccessMessage('Welcome back! Signing you in...')
       } else {
+        // Create user account
         const userCredential = await createUserWithEmailAndPassword(auth, email, password)
 
+        // Update display name if provided
         if (name.trim() !== '') {
           await updateProfile(userCredential.user, {
             displayName: name.trim(),
           })
         }
+
+        // Show success message - user is automatically signed in by Firebase
+        setSuccessMessage(`Welcome ${name.trim() || 'aboard'}! Your account has been created successfully. Signing you in...`)
       }
+
+      // The user is now automatically signed in by Firebase
+      // The parent component's onAuthStateChanged listener will handle navigation
+      
     } catch (error) {
-      setErrorMessage(error.message)
-    } finally {
+      console.error('Auth error:', error)
+      
+      // User-friendly error messages
+      let message = ''
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          message = 'This email is already registered. Please sign in instead.'
+          break
+        case 'auth/weak-password':
+          message = 'Password should be at least 6 characters long.'
+          break
+        case 'auth/invalid-email':
+          message = 'Please enter a valid email address.'
+          break
+        case 'auth/user-not-found':
+          message = 'No account found with this email. Please sign up first.'
+          break
+        case 'auth/wrong-password':
+          message = 'Incorrect password. Please try again.'
+          break
+        default:
+          message = error.message || 'An error occurred. Please try again.'
+      }
+      
+      setErrorMessage(message)
       setLoading(false)
     }
   }
 
-  return (
-    <div className="h-screen w-380 bg-[#0a0a0f] flex items-center justify-center p-4 overflow-hidden relative">
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true)
+    setErrorMessage('')
+    setSuccessMessage('')
+
+    try {
+      const provider = new GoogleAuthProvider()
+      await signInWithPopup(auth, provider)
+      setSuccessMessage('Signed in successfully! Redirecting...')
+    } catch (error) {
+      console.error('Google sign-in error:', error)
       
-      {/* Animated gradient orbs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <FloatingParticles />
-        
-        <div 
-          className="absolute w-[400px] h-[400px] rounded-full blur-[100px] opacity-25"
-          style={{
-            background: isLogin 
-              ? 'radial-gradient(circle, #3b82f6 0%, transparent 70%)'
-              : 'radial-gradient(circle, #10b981 0%, transparent 70%)',
-            left: `${15 + mousePos.x * 0.01}%`,
-            top: `${10 + mousePos.y * 0.01}%`,
-            transition: 'all 0.5s ease-out'
-          }}
-        />
-        <div 
-          className="absolute w-[350px] h-[350px] rounded-full blur-[90px] opacity-20"
-          style={{
-            background: isLogin
-              ? 'radial-gradient(circle, #8b5cf6 0%, transparent 70%)'
-              : 'radial-gradient(circle, #34d399 0%, transparent 70%)',
-            right: `${20 + mousePos.x * 0.008}%`,
-            bottom: `${15 + mousePos.y * 0.008}%`,
-            transition: 'all 0.5s ease-out'
-          }}
-        />
-      </div>
+      let message = ''
+      switch (error.code) {
+        case 'auth/operation-not-allowed':
+          message = 'Google sign-in is not enabled. Please contact support.'
+          break
+        case 'auth/unauthorized-domain':
+          message = 'This domain is not authorized for Google sign-in.'
+          break
+        case 'auth/popup-blocked':
+          message = 'Popup was blocked. Please allow popups and try again.'
+          break
+        case 'auth/popup-closed-by-user':
+          message = 'Sign-in cancelled.'
+          break
+        default:
+          message = error.message || 'Failed to sign in with Google'
+      }
+      
+      setErrorMessage(message)
+      setGoogleLoading(false)
+    }
+  }
 
-      {/* Main Auth Card - Centered */}
-      <div className="relative z-10 w-full max-w-md">
-        <div className="relative p-6 md:p-8 rounded-3xl bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl overflow-hidden">
+  const handleToggleAuthMode = () => {
+    setIsTransitioning(true)
+    
+    setTimeout(() => {
+      setIsLogin(!isLogin)
+      setName('')
+      setEmail('')
+      setPassword('')
+      setConfirmPassword('')
+      setErrorMessage('')
+      setSuccessMessage('')
+      setShowPassword(false)
+      setShowConfirmPassword(false)
+      setNameFocused(false)
+      setEmailFocused(false)
+      setPasswordFocused(false)
+      setConfirmPasswordFocused(false)
+      setIsTransitioning(false)
+    }, 400)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-gradient-to-br from-[#0a0a0f] via-[#0f0f1a] to-[#0a0a0f] overflow-hidden">
+      
+      <AnimatedBackground isLogin={isLogin} />
+      <FlyingBooks />
+
+      <div className="absolute inset-0 overflow-y-auto overflow-x-hidden">
+        <div className="min-h-full flex flex-col">
           
-          {/* Floating Icon */}
-          <div
-            className={`absolute top-27 right-5 w-13 h-12 rounded-xl flex items-center justify-center text-3xl transition-all duration-500 ${
-              isLogin 
-                ? 'bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-2 border-blue-400/30' 
-                : 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-2 border-green-400/30'
-            } backdrop-blur-xl shadow-2xl animate-bounce`}
-            aria-hidden="true"
-          >
-            {isLogin ? '🔑' : '👤'}
-          </div>
-
-          {/* Header */}
-          <div className="mb-6 text-center">
-            <h1 className="text-3xl md:text-4xl font-black mb-2 leading-tight">
-              <span className={`block bg-gradient-to-r ${
-                isLogin 
-                  ? 'from-blue-400 via-purple-400 to-blue-400' 
-                  : 'from-green-400 via-emerald-400 to-green-400'
-              } bg-clip-text text-transparent`}>
-                {isLogin ? 'Welcome Back!' : 'Join Us Today!'}
-              </span>
-            </h1>
-            <p className="text-white/70 text-sm">
-              {isLogin ? 'Sign in to your account' : 'Create your account'}
-            </p>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleAuth} className="space-y-4">
+          <div className="flex-grow flex items-center justify-center p-4 py-8">
             
-            {/* Name Field (Signup only) */}
-            {!isLogin && (
-              <div className="animate-in fade-in slide-in-from-left duration-300">
-                <label className="block text-white/90 text-xs font-bold mb-2 flex items-center gap-2" htmlFor="name">
-                  <span className="text-base">👤</span>
-                  Full Name
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white text-sm placeholder-white/40 focus:outline-none focus:border-green-500/50 focus:bg-white/10 transition-all duration-300"
-                  required={!isLogin}
-                  autoComplete="name"
-                />
-              </div>
-            )}
-
-            {/* Email Field */}
-            <div>
-              <label className="block text-white/90 text-xs font-bold mb-2 flex items-center gap-2" htmlFor="email">
-                <span className="text-base">📧</span>
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-3 rounded-xl bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white text-sm placeholder-white/40 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-300"
-                required
-                autoComplete="email"
-              />
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <label className="block text-white/90 text-xs font-bold mb-2 flex items-center gap-2" htmlFor="password">
-                <span className="text-base">🔒</span>
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                placeholder={isLogin ? 'Enter your password' : 'Create a password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 rounded-xl bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white text-sm placeholder-white/40 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-300"
-                required
-                autoComplete={isLogin ? 'current-password' : 'new-password'}
-              />
-            </div>
-
-            {/* Confirm Password Field (Signup Only) */}
-            {!isLogin && (
-              <div className="animate-in fade-in slide-in-from-right duration-300">
-                <label className="block text-white/90 text-xs font-bold mb-2 flex items-center gap-2" htmlFor="confirmPassword">
-                  <span className="text-base">✅</span>
-                  Confirm Password
-                </label>
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Confirm your password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white text-sm placeholder-white/40 focus:outline-none focus:border-green-500/50 focus:bg-white/10 transition-all duration-300"
-                  required
-                  autoComplete="new-password"
-                />
-              </div>
-            )}
-
-            {/* Error Message */}
-            {errorMessage && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 backdrop-blur-xl animate-in fade-in duration-300">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">⚠️</span>
-                  <p className="text-red-400 text-xs font-semibold flex-1">
-                    {errorMessage}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className={`group relative w-full py-3.5 rounded-xl font-bold text-white text-sm overflow-hidden transition-all duration-300 ${
-                loading ? 'opacity-60 cursor-not-allowed' : 'hover:scale-105 hover:shadow-2xl'
-              } ${
-                isLogin
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_50px_rgba(59,130,246,0.5)]'
-                  : 'bg-gradient-to-r from-green-600 to-emerald-600 shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_50px_rgba(16,185,129,0.5)]'
+            <div 
+              className={`relative z-10 w-full max-w-md transition-all duration-700 ${
+                isTransitioning 
+                  ? 'opacity-0 scale-95 rotate-2' 
+                  : 'opacity-100 scale-100 rotate-0'
               }`}
             >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
+              {/* Enhanced Glow effect */}
+              <div 
+                className={`absolute -inset-3 rounded-3xl blur-2xl transition-all duration-700 animate-pulse-slow ${
+                  isLogin 
+                    ? 'bg-gradient-to-r from-blue-600/30 via-purple-600/30 to-pink-600/30' 
+                    : 'bg-gradient-to-r from-green-600/30 via-emerald-600/30 to-teal-600/30'
+                }`}
+              />
+
+              <div className="relative rounded-3xl bg-black/40 backdrop-blur-3xl border border-white/20 shadow-[0_25px_100px_rgba(0,0,0,0.7)] overflow-hidden">
+                
+                {/* Animated gradient border */}
+                <div className="absolute inset-0 rounded-3xl opacity-50">
+                  <div 
+                    className={`absolute inset-0   rounded-3xl animate-border-flow ${
+                      isLogin 
+                        ? 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500' 
+                        : 'bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500'
+                    }`}
+                    style={{ padding: '2px', mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude' }}
+                  />
+                </div>
+
+                <div className="relative p-8 sm:p-10">
+                  
+                  {/* Header */}
+                  <div className="text-center  mb-8">
+                    <h1 
+                      className={`text-4xl sm:text-5xl font-black mb-2 leading-tight transition-all duration-500 ${
+                        isTransitioning ? 'opacity-0 -translate-y-4 scale-95' : 'opacity-100 translate-y-0 scale-100'
+                      }`}
+                    >
+                      <span className={`block animate-gradient bg-clip-text text-transparent bg-[length:200%_auto] ${
+                        isLogin 
+                          ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' 
+                          : 'bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400'
+                      }`}>
+                        {isLogin ? 'Welcome Back' : 'Join Us'}
+                      </span>
+                    </h1>
+                    <p className={`text-white/60 text-sm transition-all duration-500 ${
+                      isTransitioning ? 'opacity-0' : 'opacity-100'
+                    }`}>
+                      {isLogin ? 'Continue your journey' : 'Start your adventure'}
+                    </p>
+                  </div>
+
+                  {/* Google Sign In Button */}
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignIn}
+                    disabled={googleLoading || loading}
+                    className={`w-full mb-6 text-white/70 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-800 border-2 border-white/30 shadow-[0_8px_30px_rgba(255,255,255,0.12)] transition-all duration-300 transform hover:scale-[1.02] hover:shadow-[0_12px_40px_rgba(255,255,255,0.2)] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed ${
+                      isTransitioning ? 'opacity-0' : 'opacity-100'
+                    }`}
                   >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  <span className="text-sm">Processing...</span>
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="text-xl">{isLogin ? '🔑' : '🚀'}</span>
-                  {isLogin ? 'Sign In' : 'Create Account'}
-                  <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </span>
-              )}
+                    {googleLoading ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Signing in...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5  h-5" viewBox="0 0 24 24">
+                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        <span>Continue with Google</span>
+                      </>
+                    )}
+                  </button>
 
-              {/* Shine effect */}
-              {!loading && (
-                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12" />
-              )}
-            </button>
-          </form>
+                  {/* Divider */}
+                  <div className={`relative flex items-center justify-center my-6 transition-all duration-500 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t-2 border-white/10"></div>
+                    </div>
+                    <div className="relative bg-black/60 px-4 backdrop-blur-xl">
+                      <span className="text-xs text-white/50 font-bold tracking-wider">OR CONTINUE WITH EMAIL</span>
+                    </div>
+                  </div>
 
-          {/* Toggle Auth Mode */}
-          <div className="mt-5 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsLogin(!isLogin)
-                setName('')
-                setConfirmPassword('')
-                setErrorMessage('')
-              }}
-              className={`group inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${
-                isLogin
-                  ? 'text-green-400 hover:text-green-300 bg-green-500/10 hover:bg-green-500/20'
-                  : 'text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20'
-              } border border-white/10 hover:border-white/20`}
-            >
-              {isLogin ? "Create new account" : 'Sign in instead'}
-              <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </button>
+                  {/* Form with Floating Labels */}
+                  <form onSubmit={handleAuth} className="space-y-5">
+                    
+                    {/* Name Field with Floating Label */}
+                    {!isLogin && (
+                      <div className={`relative transition-all duration-500 ${isTransitioning ? 'opacity-0 -translate-x-6' : 'opacity-100 translate-x-0'}`}>
+                        <div className="relative">
+                          <input
+                            id="name"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            onFocus={() => setNameFocused(true)}
+                            onBlur={() => setNameFocused(false)}
+                            className={`peer w-full px-4 pt-6 pb-2 text-sm rounded-xl bg-white/5 backdrop-blur-2xl border-2 text-white placeholder-transparent focus:outline-none transition-all duration-300 ${
+                              nameFocused || name
+                                ? 'border-green-500/50 bg-white/10 shadow-[0_0_20px_rgba(16,185,129,0.15)]'
+                                : 'border-white/10 hover:border-white/20'
+                            }`}
+                            placeholder="Full Name"
+                            required={!isLogin}
+                          />
+                          <label
+                            htmlFor="name"
+                            className={`absolute left-4 transition-all duration-300 pointer-events-none ${
+                              nameFocused || name
+                                ? 'top-2 text-[10px] text-green-400 font-bold'
+                                : 'top-4 text-sm text-white/50'
+                            }`}
+                          >
+                            👤 Full Name
+                          </label>
+                          <div className={`absolute inset-0 rounded-xl blur-xl transition-opacity duration-300 ${
+                            nameFocused ? 'opacity-100 bg-green-500/10' : 'opacity-0'
+                          }`} style={{ zIndex: -1 }} />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Email Field with Floating Label */}
+                    <div className={`relative transition-all duration-500 ${isTransitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
+                      <div className="relative">
+                        <input
+                          id="email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          onFocus={() => setEmailFocused(true)}
+                          onBlur={() => setEmailFocused(false)}
+                          className={`peer w-full px-4 pt-6 pb-2 text-sm rounded-xl bg-white/5 backdrop-blur-2xl border-2 text-white placeholder-transparent focus:outline-none transition-all duration-300 ${
+                            emailFocused || email
+                              ? `${isLogin ? 'border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'border-green-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)]'} bg-white/10`
+                              : 'border-white/10 hover:border-white/20'
+                          }`}
+                          placeholder="Email Address"
+                          required
+                        />
+                        <label
+                          htmlFor="email"
+                          className={`absolute left-4 transition-all duration-300 pointer-events-none ${
+                            emailFocused || email
+                              ? `top-2 text-[10px] ${isLogin ? 'text-blue-400' : 'text-green-400'} font-bold`
+                              : 'top-4 text-sm text-white/50'
+                          }`}
+                        >
+                          📧 Email Address
+                        </label>
+                        <div className={`absolute inset-0 rounded-xl blur-xl transition-opacity duration-300 ${
+                          emailFocused ? `opacity-100 ${isLogin ? 'bg-blue-500/10' : 'bg-green-500/10'}` : 'opacity-0'
+                        }`} style={{ zIndex: -1 }} />
+                      </div>
+                    </div>
+
+                    {/* Password Field with Floating Label */}
+                    <div className={`relative transition-all duration-500 ${isTransitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
+                      <div className="relative">
+                        <input
+                          id="password"
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          onFocus={() => setPasswordFocused(true)}
+                          onBlur={() => setPasswordFocused(false)}
+                          className={`peer w-full px-4 pt-6 pb-2 pr-12 text-sm rounded-xl bg-white/5 backdrop-blur-2xl border-2 text-white placeholder-transparent focus:outline-none transition-all duration-300 ${
+                            passwordFocused || password
+                              ? `${isLogin ? 'border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'border-green-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)]'} bg-white/10`
+                              : 'border-white/10 hover:border-white/20'
+                          }`}
+                          placeholder="Password"
+                          required
+                        />
+                        <label
+                          htmlFor="password"
+                          className={`absolute left-4 transition-all duration-300 pointer-events-none ${
+                            passwordFocused || password
+                              ? `top-2 text-[10px] ${isLogin ? 'text-blue-400' : 'text-green-400'} font-bold`
+                              : 'top-4 text-sm text-white/50'
+                          }`}
+                        >
+                          🔒 Password
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-all duration-300 group"
+                        >
+                          {showPassword ? (
+                            <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                          ) : (
+                            <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                            </svg>
+                          )}
+                        </button>
+                        <div className={`absolute inset-0 rounded-xl blur-xl transition-opacity duration-300 ${
+                          passwordFocused ? `opacity-100 ${isLogin ? 'bg-blue-500/10' : 'bg-green-500/10'}` : 'opacity-0'
+                        }`} style={{ zIndex: -1 }} />
+                      </div>
+                    </div>
+
+                    {/* Confirm Password Field with Floating Label */}
+                    {!isLogin && (
+                      <div className={`relative transition-all duration-500 ${isTransitioning ? 'opacity-0 translate-x-6' : 'opacity-100 translate-x-0'}`}>
+                        <div className="relative">
+                          <input
+                            id="confirmPassword"
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            onFocus={() => setConfirmPasswordFocused(true)}
+                            onBlur={() => setConfirmPasswordFocused(false)}
+                            className={`peer w-full px-4 pt-6 pb-2 pr-12 text-sm rounded-xl bg-white/5 backdrop-blur-2xl border-2 text-white placeholder-transparent focus:outline-none transition-all duration-300 ${
+                              confirmPasswordFocused || confirmPassword
+                                ? 'border-green-500/50 bg-white/10 shadow-[0_0_20px_rgba(16,185,129,0.15)]'
+                                : 'border-white/10 hover:border-white/20'
+                            }`}
+                            placeholder="Confirm Password"
+                            required
+                          />
+                          <label
+                            htmlFor="confirmPassword"
+                            className={`absolute left-4 transition-all duration-300 pointer-events-none ${
+                              confirmPasswordFocused || confirmPassword
+                                ? 'top-2 text-[10px] text-green-400 font-bold'
+                                : 'top-4 text-sm text-white/50'
+                            }`}
+                          >
+                            ✅ Confirm Password
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-all duration-300 group"
+                          >
+                            {showConfirmPassword ? (
+                              <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            ) : (
+                              <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                              </svg>
+                            )}
+                          </button>
+                          <div className={`absolute inset-0 rounded-xl blur-xl transition-opacity duration-300 ${
+                            confirmPasswordFocused ? 'opacity-100 bg-green-500/10' : 'opacity-0'
+                          }`} style={{ zIndex: -1 }} />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Success Message */}
+                    {successMessage && (
+                      <div className="p-3 rounded-xl bg-green-500/10 border-2 border-green-500/30 backdrop-blur-xl animate-slide-in">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">✅</span>
+                          <p className="text-green-400 text-xs font-semibold flex-1">
+                            {successMessage}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Error Message */}
+                    {errorMessage && (
+                      <div className="p-3 rounded-xl bg-red-500/10 border-2 border-red-500/30 backdrop-blur-xl animate-shake">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">⚠️</span>
+                          <p className="text-red-400 text-xs font-semibold flex-1">
+                            {errorMessage}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Submit Button */}
+                    <button
+                      type="submit"
+                      disabled={loading || googleLoading}
+                      className={`group relative w-full py-4 rounded-xl font-bold text-white text-sm overflow-hidden transition-all duration-500 transform ${
+                        loading ? 'opacity-60 cursor-not-allowed scale-95' : 'hover:scale-[1.02] active:scale-[0.98]'
+                      } ${
+                        isLogin
+                          ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 shadow-[0_8px_30px_rgba(59,130,246,0.4)] hover:shadow-[0_12px_40px_rgba(59,130,246,0.6)]'
+                          : 'bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 shadow-[0_8px_30px_rgba(16,185,129,0.4)] hover:shadow-[0_12px_40px_rgba(16,185,129,0.6)]'
+                      } ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
+                    >
+                      {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span>{isLogin ? 'Signing in...' : 'Creating account...'}</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="text-lg">{isLogin ? '🚀' : '✨'}</span>
+                          <span className="tracking-wide">{isLogin ? 'Sign In' : 'Create Account'}</span>
+                        </span>
+                      )}
+
+                      {!loading && (
+                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12" />
+                      )}
+                    </button>
+                  </form>
+
+                  {/* Toggle Mode */}
+                  <div className={`mt-6 text-center transition-all duration-500 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+                    <button
+                      type="button"
+                      onClick={handleToggleAuthMode}
+                      className={`group inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 transform hover:scale-105 ${
+                        isLogin
+                          ? 'text-green-400 bg-green-500/10 hover:bg-green-500/20 border-2 border-green-500/30 hover:border-green-500/50'
+                          : 'text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 border-2 border-blue-500/30 hover:border-blue-500/50'
+                      }`}
+                    >
+                      <span className="text-base">{isLogin ? '✨' : '🔐'}</span>
+                      <span>{isLogin ? "Create new account" : 'Already have account?'}</span>
+                    </button>
+                  </div>
+
+                  {/* Trust Badges */}
+                  <div className={`mt-6 flex items-center justify-center gap-3 text-white/60 text-xs transition-all duration-500 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+                    {[
+                      { icon: '🔒', text: 'Secure' },
+                      { icon: '🚀', text: 'Fast' },
+                      { icon: '✨', text: 'Free' }
+                    ].map((badge, i) => (
+                      <div 
+                        key={i}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 backdrop-blur-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                      >
+                        <span className="text-sm">{badge.icon}</span>
+                        <span className="font-bold">{badge.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Trust indicators */}
-          <div className="mt-5 flex items-center justify-center gap-4 text-white/50 text-xs">
-            <div className="flex items-center gap-1">
-              <svg className="w-3.5 h-3.5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span>Secure</span>
+          {/* Footer */}
+          <footer className="relative z-10 border-t-2 border-white/10 bg-black/40 backdrop-blur-2xl flex-shrink-0">
+            <div className="max-w-6xl mx-auto px-4 py-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <p className="text-white/70 font-bold">
+                  © {new Date().getFullYear()} Book Haven
+                </p>
+                <nav className="flex flex-wrap items-center justify-center gap-4 text-white/50">
+                  <a 
+                    href="/docs/Terms and conditions.pdf" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
+                  >
+                    <span className="text-sm">📄</span>
+                    Terms
+                  </a>
+                  <a 
+                    href="/docs/Terms and conditions.pdf" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
+                  >
+                    <span className="text-sm">🔒</span>
+                    Privacy
+                  </a>
+                  <a 
+                    href="/docs/Terms and conditions.pdf" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
+                  >
+                    <span className="text-sm">💰</span>
+                    Refund
+                  </a>
+                </nav>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <svg className="w-3.5 h-3.5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-              </svg>
-              <span>No Spam</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <svg className="w-3.5 h-3.5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span>Free</span>
-            </div>
-          </div>
+          </footer>
 
-          {/* Decorative corner accents */}
-          <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-white/10 rounded-tl-3xl" />
-          <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-white/10 rounded-br-3xl" />
         </div>
       </div>
 
-      {/* Footer - Fixed at bottom */}
-      <footer className="absolute bottom-0 left-0 right-0 z-10 border-t border-white/10 bg-black/20 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-            <p className="text-white/70 font-semibold">
-              © {new Date().getFullYear()} E‑Bookkiee Store
-            </p>
-            <nav className="flex flex-wrap items-center justify-center gap-4 text-white/50">
-              <a href="src/components/Razor pay terms and conditions.pdf" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-                Terms
-              </a>
-              <a href="src/components/Razor pay terms and conditions.pdf" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-                Privacy
-              </a>
-              <a href="src/components/Razor pay terms and conditions.pdf" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-                Refunds
-              </a>
-              <a href="src/components/Razor pay terms and conditions.pdf" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-                Contact
-              </a>
-            </nav>
-          </div>
-        </div>
-      </footer>
+      {/* Enhanced Custom Animations */}
+      <style jsx>{`
+        @keyframes float-up {
+          0% {
+            transform: translateY(calc(100vh + 100px)) translateX(0) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.5;
+          }
+          90% {
+            opacity: 0.5;
+          }
+          100% {
+            transform: translateY(-100px) translateX(50px) rotate(360deg);
+            opacity: 0;
+          }
+        }
+
+        @keyframes blob {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          25% { transform: translate(20px, -20px) scale(1.05); }
+          50% { transform: translate(-20px, 20px) scale(0.95); }
+          75% { transform: translate(20px, 20px) scale(1.02); }
+        }
+
+        @keyframes gradient {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+
+        @keyframes slide-in {
+          0% {
+            transform: translateY(-10px);
+            opacity: 0;
+          }
+          100% {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.5; }
+        }
+
+        @keyframes border-flow {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        .animate-float-up {
+          animation: float-up linear infinite;
+        }
+
+        .animate-blob {
+          animation: blob ease-in-out infinite;
+        }
+
+        .animate-gradient {
+          animation: gradient 3s ease infinite;
+        }
+
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
+        }
+
+        .animate-slide-in {
+          animation: slide-in 0.5s ease-out;
+        }
+
+        .animate-pulse-slow {
+          animation: pulse-slow 3s ease-in-out infinite;
+        }
+
+        .animate-border-flow {
+          animation: border-flow 3s linear infinite;
+          background-size: 200% 200%;
+        }
+      `}</style>
     </div>
   )
 }
