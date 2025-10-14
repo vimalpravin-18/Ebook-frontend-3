@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from './firebase'
-import Auth from './components/Auth'
-import Payment from './components/Payment'
-import Sidebar from './components/Sidebar'
-import HomeDashboard from './components/HomeDashboard'
-import Favorites from './components/Favorites'
-import Contact from './components/Contact'
-import Profile from './components/Profile'
+import Auth from './components/Auth.jsx'
+import Payment from './components/Payment.jsx'
+import Sidebar from './components/Sidebar.jsx'
+import HomeDashboard from './components/HomeDashboard.jsx'
+import Favorites from './components/Favorites.jsx'  // ✅ FIXED: Added .jsx
+import Contact from './components/Contact.jsx'
+import Profile from './components/Profile.jsx'
 
 // Optional: tiny hook to read favorites count from localStorage
 function useFavCount(key = 'fav_books') {
@@ -88,7 +88,7 @@ function App() {
   const [minLoadingComplete, setMinLoadingComplete] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isLoggingIn, setIsLoggingIn] = useState(false)
-  const [welcomeName, setWelcomeName] = useState('') // ✅ New state for welcome name
+  const [welcomeName, setWelcomeName] = useState('')
 
   const favCount = useFavCount()
 
@@ -97,21 +97,21 @@ function App() {
     // Set minimum loading time of 3 seconds
     const minLoadingTimer = setTimeout(() => {
       setMinLoadingComplete(true)
-    }, 3000) // Change to 4000 for 4 seconds
+    }, 3000)
 
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       // If user just logged in, show loading
       if (u && !user) {
         setIsLoggingIn(true)
         
-        // ✅ Get user's name for welcome message
+        // Get user's name for welcome message
         const userName = u.displayName || u.email?.split('@')[0] || 'User'
         setWelcomeName(userName)
         
         setTimeout(() => {
           setUser(u)
           setIsLoggingIn(false)
-        }, 100) // 3 second loading after login
+        }, 100)
       } else {
         setUser(u)
       }
@@ -146,16 +146,13 @@ function App() {
     setTimeout(async () => {
       await signOut(auth)
       setIsLoggingOut(false)
-    }, 3000) // 3 second loading during logout
+    }, 3000)
   }
 
   // Show loading screen on initial load
   if (loading) {
     return <LoadingScreen message="LOADING ..." />
   }
-
-  // ✅ Show personalized welcome screen after login with user's name
-  
 
   // Show loading screen during logout
   if (isLoggingOut) {
@@ -184,10 +181,8 @@ function App() {
 
             <div className="flex items-center gap-6">
               <span className="text-white/80 font-medium hidden md:block">
-                Welcome, <span className="text-purple-300 font-bold">{user.displayName || user.email} 👋
-</span>
+                Welcome, <span className="text-purple-300 font-bold">{user.displayName || user.email} 👋</span>
               </span>
-              
             </div>
           </div>
         </header>
