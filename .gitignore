@@ -1,7 +1,37 @@
-node_modules
-dist
+# dependencies
+node_modules/
+
+# production build
+dist/
+
+# local environment variables
 .env
 .env.local
+.env.development
+.env.production
+
+# Firebase cache and configs (keep if needed)
+.firebase/
+.firebaserc
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# editor directories and files
+.vscode/
+.idea/
 .DS_Store
-*.log
-.vercel
+Thumbs.db
+
+# optional: OS generated files
+*.tmp
+*.swp
+
+# vercel deployment files (if using Vercel)
+.vercel/
+
+# backup or cache files
+*.bak
