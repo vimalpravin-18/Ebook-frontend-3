@@ -5,7 +5,7 @@ import Auth from './components/Auth.jsx'
 import Payment from './components/Payment.jsx'
 import Sidebar from './components/Sidebar.jsx'
 import HomeDashboard from './components/HomeDashboard.jsx'
-import Favorites from './components/Favorites.jsx'  // ✅ FIXED: Added .jsx
+import Favorites from './components/favorites.jsx'  // ✅ FIXED: Added .jsx
 import Contact from './components/Contact.jsx'
 import Profile from './components/Profile.jsx'
 
