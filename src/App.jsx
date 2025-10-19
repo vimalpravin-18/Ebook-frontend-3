@@ -233,7 +233,7 @@ function App() {
                   {/* ✅ UPDATED: Use button instead of anchor tag */}
                   <li>
                     <button 
-                      onClick={() => handleViewPDF('terms and conditions.pdf', 'Terms & Conditions')}
+                      onClick={() => handleViewPDF('/terms and conditions.pdf', 'Terms & Conditions')}
                       className="hover:text-purple-300 transition-colors text-left"
                     >
                       Terms & Conditions
