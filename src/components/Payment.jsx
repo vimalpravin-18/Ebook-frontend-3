@@ -546,32 +546,14 @@ export default function Payment({ user }) {
 
             {/* Enhanced Search Bar */}
             <div className="mt-12 relative max-w-2xl mx-auto">
-              <div className="relative group">
-                <input
-                  type="search"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search your next great read..."
-                  autoComplete="off"
-                  spellCheck={false}
-                  className="w-full bg-white/5 backdrop-blur-2xl border-2 border-white/10 rounded-2xl text-white text-lg placeholder-white/50 py-5 pl-16 pr-6 shadow-2xl focus:outline-none focus:border-purple-500/50 focus:bg-white/10 transition-all duration-300"
-                />
-                <svg
-                  className="w-6 h-6 text-white/60 absolute top-1/2 -translate-y-1/2 left-6 pointer-events-none group-focus-within:text-purple-400 transition-colors"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-5.2-5.2M4 10a6 6 0 1112 0 6 6 0 01-12 0z"
-                  />
-                </svg>
+              
+                
+              
+    
+                
                 {/* Search glow effect */}
                 <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-orange-600/20 rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
-              </div>
+              
               {/* Search results count */}
               {searchTerm && (
                 <div className="mt-4 text-sm text-white/60">
