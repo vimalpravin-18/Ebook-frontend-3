@@ -302,7 +302,7 @@ export default function Payment({ user }) {
       {
         id: "ikigai1",
         title: "Unlocking My Ikigai",
-        cover: "covers/Unlocking My Ikigai Book Cover.png",
+        cover: "covers/unlocking of my ikigai img.jpg",
         desc: "Discover your reason for being through Japanese philosophy and self-reflection exercises.",
         price: 11900,
         isFree: false,
