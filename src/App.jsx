@@ -7,8 +7,7 @@ import Sidebar from './components/Sidebar.jsx'
 import HomeDashboard from './components/HomeDashboard.jsx'
 import Favorites from './components/favorites.jsx'
 import Contact from './components/Contact.jsx'
-import Profile from './components/Profile.jsx'
-import PDFViewer from './components/PDFViewer.jsx'  // ✅ NEW IMPORT
+import Profile from './components/Profile.jsx'  // ✅ NEW IMPORT
 
 // Optional: tiny hook to read favorites count from localStorage
 function useFavCount(key = 'fav_books') {
