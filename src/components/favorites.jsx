@@ -175,7 +175,19 @@ const catalogData = [
     sampleUrl: '/samples/Unlocking My Ikigai.pdf',
     grad: 'from-yellow-600 to-orange-600',
     productId: '68e22d1c3afc3781bb38782b'
-  }
+  },
+      {
+        id: "Confi1",
+        title: "Psychology Of Confidence",
+        cover: "covers/psychology of confidence image.jpg",
+        desc: "Discover your reason for being through Japanese philosophy and self-reflection exercises.",
+        price: 14700,
+        isFree: false,
+        grad: "from-yellow-600 to-orange-600",
+        ring: "ring-yellow-400/30",
+        sampleUrl: "/samples/Psychology Of Confidenc preview.pdf",
+        productId: "68f460ba4ec7a02c82c74c2f",
+      }
 ]
 
 /* ========== HELPER COMPONENTS ========== */
