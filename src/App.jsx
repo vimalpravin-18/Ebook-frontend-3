@@ -8,6 +8,7 @@ import HomeDashboard from './components/HomeDashboard.jsx'
 import Favorites from './components/favorites.jsx'
 import Contact from './components/Contact.jsx'
 import Profile from './components/Profile.jsx'  // ✅ NEW IMPORT
+import PolicyViewer from './components/PolicyViewer.jsx'
 
 // Optional: tiny hook to read favorites count from localStorage
 function useFavCount(key = 'fav_books') {
@@ -201,6 +202,11 @@ function App() {
             <Profile />
           )}
 
+          {activePage === 'policies' && (
+  <PolicyViewer onBack={() => setActivePage('home')} />
+)}
+
+
           {/* ✅ NEW: PDF Viewer Page */}
           {activePage === 'pdf-viewer' && currentPDF && (
             <PDFViewer 
@@ -230,54 +236,44 @@ function App() {
   <div className="text-sm font-bold text-white/80 mb-4 ml-40 uppercase tracking-wider">Quick Links</div>
   <ul className="space-y-2 text-sm text-white/60 ml-40">
     <li>
-      <a 
-        href="/terms-and-conditions.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-purple-300 transition-colors"
+      <button 
+        onClick={() => setActivePage('policies')}
+        className="hover:text-purple-300 transition-colors text-left"
       >
         Terms & Conditions
-      </a>
+      </button>
     </li>
     <li>
-      <a 
-        href="/Privacy-policy.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-purple-300 transition-colors"
+      <button 
+        onClick={() => setActivePage('policies')}
+        className="hover:text-purple-300 transition-colors text-left"
       >
-        Privacy
-      </a>
+        Privacy Policy
+      </button>
     </li>
     <li>
-      <a 
-        href="/Shipping-policy.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-purple-300 transition-colors"
+      <button 
+        onClick={() => setActivePage('policies')}
+        className="hover:text-purple-300 transition-colors text-left"
       >
-        Shipping
-      </a>
+        Shipping Policy
+      </button>
     </li>
     <li>
-      <a 
-        href="/Refund-Policy.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-purple-300 transition-colors"
+      <button 
+        onClick={() => setActivePage('policies')}
+        className="hover:text-purple-300 transition-colors text-left"
       >
-        Refund
-      </a>
+        Refund Policy
+      </button>
     </li>
     <li>
-      <a 
-        href="/Contact-Us.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-purple-300 transition-colors"
+      <button 
+        onClick={() => setActivePage('policies')}
+        className="hover:text-purple-300 transition-colors text-left"
       >
-        Contact Us
-      </a>
+        Contact Information
+      </button>
     </li>
   </ul>
 </div>
