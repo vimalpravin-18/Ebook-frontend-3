@@ -564,7 +564,7 @@ export default function Auth() {
                 </p>
                 <nav className="flex flex-wrap items-center justify-center gap-4 text-white/50">
                   <a 
-                    href="\public\terms and conditions.pdf" 
+                    href="\public\terms-and-conditions.pdf" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
@@ -573,7 +573,7 @@ export default function Auth() {
                     Terms & Conditions
                   </a>
                   <a 
-                    href="\public\Privacy policy.pdf" 
+                    href="\public\Privacy-policy.pdf" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
@@ -583,7 +583,7 @@ export default function Auth() {
                   </a>
 
                   <a 
-                    href="\public\Shipping policy.pdf" 
+                    href="\public\Shipping-policy.pdf" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
@@ -592,7 +592,7 @@ export default function Auth() {
                     Shipping
                   </a>
                   <a 
-                    href="\public\Refund Policy.pdf" 
+                    href="\public\Refund-Policy.pdf" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
@@ -601,7 +601,7 @@ export default function Auth() {
                     Refund
                   </a>
                   <a 
-                    href="\public\Contact Us.pdf" 
+                    href="\public\Contact-Us.pdf" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
