@@ -7,7 +7,7 @@ import Sidebar from './components/Sidebar.jsx'
 import HomeDashboard from './components/HomeDashboard.jsx'
 import Favorites from './components/favorites.jsx'
 import Contact from './components/Contact.jsx'
-import Profile from './components/Profile.jsx'  // ✅ NEW IMPORT
+import Profile from './components/Profile.jsx'
 import PolicyViewer from './components/PolicyViewer.jsx'
 
 // Optional: tiny hook to read favorites count from localStorage
@@ -88,7 +88,6 @@ function App() {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isLoggingIn, setIsLoggingIn] = useState(false)
   const [welcomeName, setWelcomeName] = useState('')
-  const [currentPDF, setCurrentPDF] = useState(null)  // ✅ NEW STATE
 
   const favCount = useFavCount()
 
@@ -140,12 +139,6 @@ function App() {
       await signOut(auth)
       setIsLoggingOut(false)
     }, 3000)
-  }
-
-  // ✅ NEW FUNCTION: Handle PDF viewing
-  const handleViewPDF = (pdfPath, title) => {
-    setCurrentPDF({ path: pdfPath, title })
-    setActivePage('pdf-viewer')
   }
 
   if (loading) {
@@ -203,20 +196,7 @@ function App() {
           )}
 
           {activePage === 'policies' && (
-  <PolicyViewer onBack={() => setActivePage('home')} />
-)}
-
-
-          {/* ✅ NEW: PDF Viewer Page */}
-          {activePage === 'pdf-viewer' && currentPDF && (
-            <PDFViewer 
-              pdfPath={currentPDF.path}
-              title={currentPDF.title}
-              onClose={() => {
-                setActivePage('home')
-                setCurrentPDF(null)
-              }}
-            />
+            <PolicyViewer onBack={() => setActivePage('home')} />
           )}
         </div>
 
@@ -232,51 +212,51 @@ function App() {
                 </p>
               </div>
               
-             <div>
-  <div className="text-sm font-bold text-white/80 mb-4 ml-40 uppercase tracking-wider">Quick Links</div>
-  <ul className="space-y-2 text-sm text-white/60 ml-40">
-    <li>
-      <button 
-        onClick={() => setActivePage('policies')}
-        className="hover:text-purple-300 transition-colors text-left"
-      >
-        Terms & Conditions
-      </button>
-    </li>
-    <li>
-      <button 
-        onClick={() => setActivePage('policies')}
-        className="hover:text-purple-300 transition-colors text-left"
-      >
-        Privacy Policy
-      </button>
-    </li>
-    <li>
-      <button 
-        onClick={() => setActivePage('policies')}
-        className="hover:text-purple-300 transition-colors text-left"
-      >
-        Shipping Policy
-      </button>
-    </li>
-    <li>
-      <button 
-        onClick={() => setActivePage('policies')}
-        className="hover:text-purple-300 transition-colors text-left"
-      >
-        Refund Policy
-      </button>
-    </li>
-    <li>
-      <button 
-        onClick={() => setActivePage('policies')}
-        className="hover:text-purple-300 transition-colors text-left"
-      >
-        Contact Information
-      </button>
-    </li>
-  </ul>
-</div>
+              <div>
+                <div className="text-sm font-bold text-white/80 mb-4 ml-40 uppercase tracking-wider">Quick Links</div>
+                <ul className="space-y-2 text-sm text-white/60 ml-40">
+                  <li>
+                    <span 
+                      onClick={() => setActivePage('policies')}
+                      className="hover:text-purple-300 transition-colors cursor-pointer"
+                    >
+                      Terms & Conditions
+                    </span>
+                  </li>
+                  <li>
+                    <span 
+                      onClick={() => setActivePage('policies')}
+                      className="hover:text-purple-300 transition-colors cursor-pointer"
+                    >
+                      Privacy Policy
+                    </span>
+                  </li>
+                  <li>
+                    <span 
+                      onClick={() => setActivePage('policies')}
+                      className="hover:text-purple-300 transition-colors cursor-pointer"
+                    >
+                      Shipping Policy
+                    </span>
+                  </li>
+                  <li>
+                    <span 
+                      onClick={() => setActivePage('policies')}
+                      className="hover:text-purple-300 transition-colors cursor-pointer"
+                    >
+                      Refund Policy
+                    </span>
+                  </li>
+                  <li>
+                    <span 
+                      onClick={() => setActivePage('policies')}
+                      className="hover:text-purple-300 transition-colors cursor-pointer"
+                    >
+                      Contact Information
+                    </span>
+                  </li>
+                </ul>
+              </div>
 
               <div>
                 <div className="text-sm font-bold text-white/80 mb-4 uppercase tracking-wider">Contact</div>
