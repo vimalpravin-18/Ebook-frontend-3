@@ -266,7 +266,7 @@ function App() {
                       href="https://www.instagram.com/_____op__vimal_____/" 
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-purple-300 transition-colors"
+                       className="hover:text-purple-300 transition-colors cursor-pointer"
                     >
                       Instagram
                     </a>
@@ -276,7 +276,7 @@ function App() {
                       href="https://www.linkedin.com/in/vimal-pravin-v" 
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-purple-300 transition-colors"
+                       className="hover:text-purple-300 transition-colors cursor-pointer"
                     >
                       LinkedIn
                     </a>
@@ -286,7 +286,7 @@ function App() {
                       href="https://github.com/vimalpravin-18" 
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-purple-300 transition-colors"
+                       className="hover:text-purple-300 transition-colors cursor-pointer"
                     >
                       Github
                     </a>
@@ -296,7 +296,7 @@ function App() {
                       href="mailto:vimalpravin071@gmail.com" 
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-purple-300 transition-colors"
+                       className="hover:text-purple-300 transition-colors cursor-pointer"
                     >
                       Email
                     </a>
