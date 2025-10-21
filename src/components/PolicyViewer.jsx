@@ -6,7 +6,7 @@ function PolicyViewer({ onBack }) {
   const policies = {
     terms: {
       title: 'Terms & Conditions',
-      pdfPath: '/terms-and-conditions.pdf'
+      pdfPath: 'terms-and-conditions.pdf'
     },
     privacy: {
       title: 'Privacy Policy',
