@@ -168,7 +168,7 @@ function App() {
 
             <div className="flex items-center gap-6">
               <span className="text-white/80 font-medium hidden md:block">
-                Welcome, <span className="text-purple-300 font-bold">{user.displayName || user.email} 👋</span>
+                Welcome, <span className="text-purple-300 font-bold">{user.displayName} 👋</span>
               </span>
             </div>
           </div>
