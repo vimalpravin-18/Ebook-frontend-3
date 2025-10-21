@@ -6,23 +6,23 @@ function PolicyViewer({ onBack }) {
   const policies = {
     terms: {
       title: 'Terms & Conditions',
-      pdfPath: '/public/terms-and-conditions.pdf'
+      pdfPath: '/terms-and-conditions.pdf'
     },
     privacy: {
       title: 'Privacy Policy',
-      pdfPath: '/public/Privacy-policy.pdf'
+      pdfPath: '/Privacy-policy.pdf'
     },
     shipping: {
       title: 'Shipping Policy',
-      pdfPath: '/public/Shipping-policy.pdf'
+      pdfPath: '/Shipping-policy.pdf'
     },
     refund: {
       title: 'Refund Policy',
-      pdfPath: '/public/Refund-Policy.pdf'
+      pdfPath: '/Refund-Policy.pdf'
     },
     contact: {
       title: 'Contact Us',
-      pdfPath: '/public/Contact-Us.pdf'
+      pdfPath: '/Contact-Us.pdf'
     }
   }
 
