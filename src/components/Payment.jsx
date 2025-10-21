@@ -747,7 +747,7 @@ export default function Payment({ user }) {
           {/* DOWNLOAD MODAL - FIXED */}
           {showDownload && downloadToken && downloadBook && (
             <div
-              className="fixed inset-0 z-[2000]  bg-black/95 backdrop-blur-xl flex items-center mb-240  justify-center p-4"
+              className="fixed inset-0 z-[2000]  bg-black/95 backdrop-blur-xl flex items-center mb-280  justify-center p-4"
               style={{ animation: "fadeIn 0.3s ease-in" }}
             >
               <div
