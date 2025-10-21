@@ -280,12 +280,6 @@ export default function Auth() {
                     </p>
                   </div>
 
-                  {/* Google Sign In Button */}
-                
-
-                  {/* Divider */}
-                  
-
                   {/* Form with Floating Labels */}
                   <form onSubmit={handleAuth} className="space-y-5">
                     
@@ -555,16 +549,12 @@ export default function Auth() {
             </div>
           </div>
 
-          {/* Footer */}
+          {/* Footer - Centered Copyright */}
           <footer className="relative z-10 border-t-2 border-white/10 bg-black/40 backdrop-blur-2xl flex-shrink-0">
-            <div className="max-w-6xl mx-auto px-4 py-4">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                <p className="text-white/70 font-bold">
-                  © {new Date().getFullYear()} Bookly
-                </p>
-                
-                </nav>
-              </div>
+            <div className="max-w-6xl mx-auto px-4 py-5">
+              <p className="text-center text-white font-bold text-sm">
+                © {new Date().getFullYear()} Bookly
+              </p>
             </div>
           </footer>
 
