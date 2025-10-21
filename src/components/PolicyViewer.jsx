@@ -10,75 +10,80 @@ function PolicyViewer({ onBack }) {
     },
     privacy: {
       title: 'Privacy Policy',
-      pdfPath: '/Privacy-policy.pdf'
+      pdfPath: 'Privacy-policy.pdf'
     },
     shipping: {
       title: 'Shipping Policy',
-      pdfPath: '/Shipping-policy.pdf'
+      pdfPath: 'Shipping-policy.pdf'
     },
     refund: {
       title: 'Refund Policy',
-      pdfPath: '/Refund-Policy.pdf'
+      pdfPath: 'Refund-Policy.pdf'
     },
     contact: {
       title: 'Contact Us',
-      pdfPath: '/Contact-Us.pdf'
+      pdfPath: 'Contact-Us.pdf'
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-purple-950/20 to-[#0a0a0f] py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header with Back Button */}
-        <div className="mb-8 flex items-center gap-4">
-          <button
-            onClick={onBack}
-            className="px-6 py-3 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-400/30 rounded-xl text-white font-semibold transition-all duration-300 hover:scale-105"
-          >
-            ← Back
-          </button>
-          <h1 className="text-4xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Policies & Information
-          </h1>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-purple-950/20 to-[#0a0a0f]">
+      {/* Header */}
+      <div className="bg-black/40 backdrop-blur-xl border-b border-white/10 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={onBack}
+              className="px-4 py-2 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-400/30 rounded-lg text-white font-semibold transition-all duration-300"
+            >
+              ← Back
+            </button>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              {policies[selectedPolicy].title}
+            </h1>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar Navigation */}
-          <div className="lg:col-span-1 space-y-3">
+          {/* Policy Navigation Tabs */}
+          <div className="hidden md:flex gap-2">
             {Object.entries(policies).map(([key, policy]) => (
               <button
                 key={key}
                 onClick={() => setSelectedPolicy(key)}
-                className={`w-full text-left px-6 py-4 rounded-xl font-semibold transition-all duration-300 ${
+                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                   selectedPolicy === key
-                    ? 'bg-purple-600/40 border-2 border-purple-400 text-white scale-105'
-                    : 'bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                {policy.title}
+                {policy.title.split(' ')[0]}
               </button>
             ))}
           </div>
-
-          {/* PDF Viewer */}
-          <div className="lg:col-span-3">
-            <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
-              <div className="p-4 border-b border-white/10 bg-purple-600/10">
-                <h2 className="text-2xl font-bold text-white">
-                  {policies[selectedPolicy].title}
-                </h2>
-              </div>
-              <div className="relative" style={{ height: '75vh' }}>
-                <iframe
-                  src={policies[selectedPolicy].pdfPath}
-                  className="w-full h-full"
-                  title={policies[selectedPolicy].title}
-                  frameBorder="0"
-                />
-              </div>
-            </div>
-          </div>
         </div>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden mt-4">
+          <select
+            value={selectedPolicy}
+            onChange={(e) => setSelectedPolicy(e.target.value)}
+            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white font-medium focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            {Object.entries(policies).map(([key, policy]) => (
+              <option key={key} value={key} className="bg-gray-900">
+                {policy.title}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* PDF Viewer - Full Height */}
+      <div className="w-full" style={{ height: 'calc(100vh - 140px)' }}>
+        <iframe
+          src={policies[selectedPolicy].pdfPath}
+          className="w-full h-full border-0"
+          title={policies[selectedPolicy].title}
+        />
       </div>
     </div>
   )
