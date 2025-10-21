@@ -562,53 +562,7 @@ export default function Auth() {
                 <p className="text-white/70 font-bold">
                   © {new Date().getFullYear()} Bookly
                 </p>
-                <nav className="flex flex-wrap items-center justify-center gap-4 text-white/50">
-                  <a 
-                    href="\public\terms-and-conditions.pdf" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
-                  >
-                    <span className="text-sm">📄</span>
-                    Terms & Conditions
-                  </a>
-                  <a 
-                    href="\public\Privacy-policy.pdf" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
-                  >
-                    <span className="text-sm">🪩</span>
-                    Privacy
-                  </a>
-
-                  <a 
-                    href="\public\Shipping-policy.pdf" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
-                  >
-                    <span className="text-sm">🔒</span>
-                    Shipping
-                  </a>
-                  <a 
-                    href="\public\Refund-Policy.pdf" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
-                  >
-                    <span className="text-sm">💰</span>
-                    Refund
-                  </a>
-                  <a 
-                    href="\public\Contact-Us.pdf" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="hover:text-white transition-colors duration-300 flex items-center gap-1 font-semibold"
-                  >
-                    <span className="text-sm">📞</span>
-                    Contact Us
-                  </a>
+                
                 </nav>
               </div>
             </div>
