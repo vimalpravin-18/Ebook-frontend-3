@@ -201,115 +201,121 @@ function App() {
         </div>
 
         <footer className="relative py-16 px-6 border-t border-white/10 bg-black/30 backdrop-blur-xl">
-          <div className="mx-auto max-w-7xl ml-50">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-12">
-              <div>
-                <div className="text-2xl font-black mb-4 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
-                  Your Library
-                </div>
-                <p className="text-white/60 text-sm leading-relaxed">
-                  Premium digital ebooks for ambitious creators and coders. Built with passion for readers who lead.
-                </p>
-              </div>
-              
-              <div>
-                <div className="text-sm font-bold text-white/80 mb-4 ml-40 uppercase tracking-wider">Quick Links</div>
-                <ul className="space-y-2 text-sm text-white/60 ml-40">
-                  <li>
-                    <span 
-                      onClick={() => setActivePage('policies')}
-                      className="hover:text-purple-300 transition-colors cursor-pointer"
-                    >
-                      Terms & Conditions
-                    </span>
-                  </li>
-                  <li>
-                    <span 
-                      onClick={() => setActivePage('policies')}
-                      className="hover:text-purple-300 transition-colors cursor-pointer"
-                    >
-                      Privacy Policy
-                    </span>
-                  </li>
-                  <li>
-                    <span 
-                      onClick={() => setActivePage('policies')}
-                      className="hover:text-purple-300 transition-colors cursor-pointer"
-                    >
-                      Shipping Policy
-                    </span>
-                  </li>
-                  <li>
-                    <span 
-                      onClick={() => setActivePage('policies')}
-                      className="hover:text-purple-300 transition-colors cursor-pointer"
-                    >
-                      Refund Policy
-                    </span>
-                  </li>
-                  <li>
-                    <span 
-                      onClick={() => setActivePage('policies')}
-                      className="hover:text-purple-300 transition-colors cursor-pointer"
-                    >
-                      Contact Information
-                    </span>
-                  </li>
-                </ul>
-              </div>
+  <div className="mx-auto max-w-7xl ml-50">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-12">
+      <div>
+        <div className="text-2xl font-black mb-4 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
+          Your Library
+        </div>
+        <p className="text-white/60 text-sm leading-relaxed">
+          Premium digital ebooks for ambitious creators and coders. Built with passion for readers who lead.
+        </p>
+      </div>
+      
+      <div>
+        <div className="text-sm font-bold text-white/80 mb-4 ml-40 uppercase tracking-wider">Quick Links</div>
+        <ul className="space-y-2 text-sm text-white/60 ml-40">
+          <li>
+            <a 
+              href="#"
+              onClick={() => setActivePage('policies')}
+              className="hover:text-purple-300 transition-colors cursor-pointer"
+            >
+              Terms & Conditions
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#"
+              onClick={() => setActivePage('policies')}
+              className="hover:text-purple-300 transition-colors cursor-pointer"
+            >
+              Privacy Policy
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#"
+              onClick={() => setActivePage('policies')}
+              className="hover:text-purple-300 transition-colors cursor-pointer"
+            >
+              Shipping Policy
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#"
+              onClick={() => setActivePage('policies')}
+              className="hover:text-purple-300 transition-colors cursor-pointer"
+            >
+              Refund Policy
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#"
+              onClick={() => setActivePage('policies')}
+              className="hover:text-purple-300 transition-colors cursor-pointer"
+            >
+              Contact Information
+            </a>
+          </li>
+        </ul>
+      </div>
 
-              <div>
-                <div className="text-sm font-bold text-white/80 mb-4 uppercase tracking-wider">Contact</div>
-                <ul className="space-y-2 text-sm text-white/60">
-                  <li>
-                    <a 
-                      href="https://www.instagram.com/_____op__vimal_____/" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                       className="hover:text-purple-300 transition-colors cursor-pointer"
-                    >
-                      Instagram
-                    </a>
-                  </li>
-                  <li>
-                    <a 
-                      href="https://www.linkedin.com/in/vimal-pravin-v" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                       className="hover:text-purple-300 transition-colors cursor-pointer"
-                    >
-                      LinkedIn
-                    </a>
-                  </li>
-                  <li>
-                    <a 
-                      href="https://github.com/vimalpravin-18" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                       className="hover:text-purple-300 transition-colors cursor-pointer"
-                    >
-                      Github
-                    </a>
-                  </li>
-                  <li>
-                    <a 
-                      href="mailto:vimalpravin071@gmail.com" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                       className="hover:text-purple-300 transition-colors cursor-pointer"
-                    >
-                      Email
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="pt-8 border-t border-white/10 text-center -ml-50 text-white/50 text-sm">
-              © 2025 Bookly. Built with passion for readers who lead.
-            </div>
-          </div>
-        </footer>
+      <div>
+        <div className="text-sm font-bold text-white/80 mb-4 uppercase tracking-wider">Contact</div>
+        <ul className="space-y-2 text-sm text-white/60">
+          <li>
+            <a 
+              href="https://www.instagram.com/_____op__vimal_____/" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-purple-300 transition-colors cursor-pointer"
+            >
+              Instagram
+            </a>
+          </li>
+          <li>
+            <a 
+              href="https://www.linkedin.com/in/vimal-pravin-v" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-purple-300 transition-colors cursor-pointer"
+            >
+              LinkedIn
+            </a>
+          </li>
+          <li>
+            <a 
+              href="https://github.com/vimalpravin-18" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-purple-300 transition-colors cursor-pointer"
+            >
+              Github
+            </a>
+          </li>
+          <li>
+            <a 
+              href="mailto:vimalpravin071@gmail.com" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-purple-300 transition-colors cursor-pointer"
+            >
+              Email
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <div className="pt-8 border-t border-white/10 text-center -ml-50 text-white/50 text-sm">
+      © 2025 Bookly. Built with passion for readers who lead.
+    </div>
+  </div>
+</footer>
+
       </div>
     </div>
   )
