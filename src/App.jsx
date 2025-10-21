@@ -168,7 +168,7 @@ function App() {
 
             <div className="flex items-center gap-6">
               <span className="text-white/80 font-medium hidden md:block">
-                Welcome, <span className="text-purple-300 font-bold">{user.displayName} || {user.email}👋</span>
+                Welcome, <span className="text-purple-300 font-bold">{user.displayName} || {user.displayEmail}👋</span>
               </span>
             </div>
           </div>
@@ -249,15 +249,6 @@ function App() {
               className="hover:text-purple-300 transition-colors cursor-pointer"
             >
               Refund Policy
-            </a>
-          </li>
-          <li>
-            <a 
-              href="#"
-              onClick={() => setActivePage('policies')}
-              className="hover:text-purple-300 transition-colors cursor-pointer"
-            >
-              Contact Information
             </a>
           </li>
         </ul>
