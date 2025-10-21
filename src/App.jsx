@@ -226,52 +226,61 @@ function App() {
                 </p>
               </div>
               
-              <div>
-                <div className="text-sm font-bold text-white/80 mb-4 ml-40 uppercase tracking-wider">Quick Links</div>
-                <ul className="space-y-2 text-sm text-white/60 ml-40">
-                  {/* ✅ UPDATED: Use button instead of anchor tag */}
-                  <li>
-                    <button 
-                      onClick={() => handleViewPDF('/terms-and-conditions.pdf', 'Terms & Conditions')}
-                      className="hover:text-purple-300 transition-colors text-left"
-                    >
-                      Terms & Conditions
-                    </button>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={() => handleViewPDF('/Privacy-policy.pdf', 'Privacy Policy')}
-                      className="hover:text-purple-300 transition-colors text-left"
-                    >
-                      Privacy
-                    </button>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={() => handleViewPDF('/Shipping-policy.pdf', 'Shipping Policy')}
-                      className="hover:text-purple-300 transition-colors text-left"
-                    >
-                      Shipping
-                    </button>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={() => handleViewPDF('/Refund-Policy.pdf', 'Refund Policy')}
-                      className="hover:text-purple-300 transition-colors text-left"
-                    >
-                      Refund
-                    </button>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={() => handleViewPDF('/Contact-Us.pdf', 'Shipping Policy')}
-                      className="hover:text-purple-300 transition-colors text-left"
-                    >
-                      Contact Us
-                    </button>
-                  </li>
-                </ul>
-              </div>
+             <div>
+  <div className="text-sm font-bold text-white/80 mb-4 ml-40 uppercase tracking-wider">Quick Links</div>
+  <ul className="space-y-2 text-sm text-white/60 ml-40">
+    <li>
+      <a 
+        href="/terms-and-conditions.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-purple-300 transition-colors"
+      >
+        Terms & Conditions
+      </a>
+    </li>
+    <li>
+      <a 
+        href="/Privacy-policy.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-purple-300 transition-colors"
+      >
+        Privacy
+      </a>
+    </li>
+    <li>
+      <a 
+        href="/Shipping-policy.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-purple-300 transition-colors"
+      >
+        Shipping
+      </a>
+    </li>
+    <li>
+      <a 
+        href="/Refund-Policy.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-purple-300 transition-colors"
+      >
+        Refund
+      </a>
+    </li>
+    <li>
+      <a 
+        href="/Contact-Us.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-purple-300 transition-colors"
+      >
+        Contact Us
+      </a>
+    </li>
+  </ul>
+</div>
 
               <div>
                 <div className="text-sm font-bold text-white/80 mb-4 uppercase tracking-wider">Contact</div>
