@@ -553,7 +553,7 @@ export default function Auth() {
           <footer className="relative z-10 border-t-2 border-white/10 bg-black/40 backdrop-blur-2xl flex-shrink-0">
             <div className="max-w-6xl mx-auto px-4 py-5">
               <p className="text-center text-white font-bold text-sm">
-                © {new Date().getFullYear()} Bookly
+                © {new Date().getFullYear()} Bookly Vimal Pravin All Rights Reserverd.
               </p>
             </div>
           </footer>
