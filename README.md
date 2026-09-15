@@ -4,9 +4,7 @@ Bookly is a full-stack eBook platform that allows users to browse digital books,
 
 ## 🚀 Live Demo
 
-Frontend: https://your-frontend-url.vercel.app
-
-Backend API: https://your-backend-url.onrender.com
+Frontend: https://ebook-frontend-3.vercel.app
 
 ---
 
